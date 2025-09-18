@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao Shopping Lists</title>
+    <link rel="stylesheet" href="../../static/css/style.css">
+    <link rel="stylesheet" href="../../static/css/shopping-system.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="shopping-welcome-container">
+        <!-- Floating particles -->
+        <div class="shopping-floating-particles" id="particles">
+            <div class="shopping-particle"></div>
+            <div class="shopping-particle"></div>
+            <div class="shopping-particle"></div>
+            <div class="shopping-particle"></div>
+            <div class="shopping-particle"></div>
+            <div class="shopping-particle"></div>
+            <div class="shopping-particle"></div>
+            <div class="shopping-particle"></div>
+            <div class="shopping-particle"></div>
+        </div>
+
+        <div class="shopping-welcome-card">
+            <div class="shopping-welcome-header">
+                <div class="shopping-welcome-logo">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z"/>
+                        <path d="M9 8V17H11V8H9ZM13 8V17H15V8H13Z"/>
+                    </svg>
+                </div>
+                <h1 class="shopping-welcome-title">Shopping Lists</h1>
+                <p class="shopping-welcome-subtitle">Suas listas de compras inteligentes</p>
+            </div>
+
+            <div class="shopping-welcome-description">
+                <h3>🛒 Organize suas compras como nunca antes!</h3>
+                <p>Crie listas de compras personalizadas, compartilhe com familiares e economize tempo e dinheiro.</p>
+                
+                <ul class="shopping-benefits-list">
+                    <li>Listas organizadas por categoria e preço</li>
+                    <li>Compartilhamento fácil via código</li>
+                    <li>Controle de gastos por mercado</li>
+                    <li>Interface intuitiva e responsiva</li>
+                </ul>
+            </div>
+
+            <form class="shopping-welcome-form" id="welcomeForm">
+                <div class="shopping-form-section">
+                    <h3 class="shopping-form-section-title">
+                        <svg class="shopping-form-section-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1L9 7V9H21ZM12 8C10.9 8 10 8.9 10 10S10.9 12 12 12 14 11.1 14 10 13.1 8 12 8Z"/>
+                        </svg>
+                        Dados Pessoais
+                    </h3>
+                    
+                    <div class="shopping-form-grid">
+                        <div class="shopping-form-group">
+                            <label class="shopping-form-label" for="userName">Nome completo</label>
+                            <input class="shopping-form-input" type="text" id="userName" name="userName" placeholder="Digite seu nome completo">
+                        </div>
+                        
+                        <div class="shopping-form-group">
+                            <label class="shopping-form-label" for="userPhone">Telefone (WhatsApp)</label>
+                            <input class="shopping-form-input" type="tel" id="userPhone" name="userPhone" placeholder="(11) 99999-9999">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shopping-form-section">
+                    <h3 class="shopping-form-section-title">
+                        <svg class="shopping-form-section-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z"/>
+                        </svg>
+                        Mercado Preferido
+                    </h3>
+                    
+                    <div class="shopping-form-group">
+                        <label class="shopping-form-label" for="preferredMarket">Escolha seu mercado</label>
+                        <div class="shopping-select-wrapper">
+                            <select class="shopping-form-select" id="preferredMarket" name="preferredMarket">
+                                <option value="">Selecione um mercado</option>
+                                <option value="carrefour">Carrefour</option>
+                                <option value="pao-de-acucar">Pão de Açúcar</option>
+                                <option value="extra">Extra</option>
+                                <option value="walmart">Walmart</option>
+                                <option value="atacadao">Atacadão</option>
+                                <option value="assai">Assaí</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        <div class="shopping-market-info" id="marketInfo">
+                            <h4>💡 Dica inteligente</h4>
+                            <p>Escolher um mercado ajuda a personalizar suas listas com produtos e preços específicos da rede!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shopping-welcome-actions">
+                    <button type="submit" class="btn btn-primary btn-large" style="background: #0284c7; color: white; padding: 16px 24px; border-radius: 8px; border: none; display: flex; align-items: center; gap: 8px;">
+                        <span>Começar Agora</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-large" id="skipBtn" style="background: #6b7280; color: white; padding: 16px 24px; border-radius: 8px; border: none;">
+                        Pular por Agora
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('welcomeForm');
+            const skipBtn = document.getElementById('skipBtn');
+            const marketSelect = document.getElementById('preferredMarket');
+            const marketInfo = document.getElementById('marketInfo');
+            const phoneInput = document.getElementById('userPhone');
+
+            // Máscara de telefone
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 11) {
+                    value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                } else if (value.length >= 7) {
+                    value = value.replace(/^(\d{2})(\d{4})(\d+)/, '($1) $2-$3');
+                } else if (value.length >= 3) {
+                    value = value.replace(/^(\d{2})(\d+)/, '($1) $2');
+                } else if (value.length >= 1) {
+                    value = value.replace(/^(\d+)/, '($1');
+                }
+                e.target.value = value;
+            });
+
+            // Mostrar informações do mercado
+            marketSelect.addEventListener('change', function() {
+                if (this.value) {
+                    marketInfo.classList.add('show');
+                } else {
+                    marketInfo.classList.remove('show');
+                }
+            });
+
+            // Função para gerar dados aleatórios
+            function generateRandomName() {
+                const names = ['Ana Silva', 'João Santos', 'Maria Oliveira', 'Pedro Costa', 'Lucas Pereira'];
+                return names[Math.floor(Math.random() * names.length)];
+            }
+
+            function generateRandomPhone() {
+                const prefix = '11';
+                const number = Math.floor(Math.random() * 900000000) + 100000000;
+                return `(${prefix}) 9${number.toString().substring(0, 4)}-${number.toString().substring(4)}`;
+            }
+
+            // Função para processar e redirecionar
+            function processAndRedirect(name, phone, skipped = false) {
+                const userData = {
+                    name: name,
+                    phone: phone,
+                    market: marketSelect.value || 'outros',
+                    skipped: skipped,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Salvar no localStorage
+                localStorage.setItem('userData', JSON.stringify(userData));
+
+                // Redirecionar para a página principal
+                window.location.href = '/src/pages/shopping-lists.html';
+            }
+
+            // Envio do formulário
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Formulário enviado');
+                
+                const userName = document.getElementById('userName').value || generateRandomName();
+                const userPhone = document.getElementById('userPhone').value || generateRandomPhone();
+                
+                console.log('Nome:', userName, 'Telefone:', userPhone);
+                
+                processAndRedirect(userName, userPhone);
+            });
+
+            // Botão de pular
+            skipBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Botão pular clicado');
+                const name = generateRandomName();
+                const phone = generateRandomPhone();
+                processAndRedirect(name, phone, true);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+node_modules/
+.netlify/
+dist/
+build/
+*.min.js
+*.min.css
+package-lock.json
+.env
+.env.*
+docs/
+*.log

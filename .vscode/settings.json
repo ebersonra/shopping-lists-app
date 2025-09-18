@@ -1,0 +1,49 @@
+{
+  "folders": [
+    {
+      "name": "Root",
+      "path": "."
+    },
+    {
+      "name": "Source",
+      "path": "./src"
+    },
+    {
+      "name": "Static Assets",
+      "path": "./static"
+    },
+    {
+      "name": "Tests",
+      "path": "./tests"
+    },
+    {
+      "name": "Database",
+      "path": "./database"
+    }
+  ],
+  "settings": {
+    "emmet.includeLanguages": {
+      "javascript": "javascriptreact"
+    },
+    "files.associations": {
+      "*.css": "css",
+      "*.html": "html"
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    "css.validate": true,
+    "css.lint.unknownAtRules": "ignore",
+    "html.format.wrapAttributes": "force-aligned"
+  },
+  "extensions": {
+    "recommendations": [
+      "esbenp.prettier-vscode",
+      "bradlc.vscode-tailwindcss",
+      "ms-vscode.vscode-json",
+      "ms-vscode.live-server"
+    ]
+  }
+}
