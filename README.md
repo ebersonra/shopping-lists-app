@@ -154,6 +154,31 @@ Execute os testes com:
 npm test
 ```
 
+## 🔄 CI/CD - GitHub Actions
+
+O projeto está configurado com GitHub Actions para automação de build e deploy:
+
+### Workflows Disponíveis
+
+- **CI - Build and Test**: Executa build e testes em cada pull request e push
+  - Testa em Node.js 18.x e 20.x
+  - Verifica formatação do código
+  - Executa testes automatizados
+
+- **Deploy to Netlify**: Deploy automático para produção
+  - Executa automaticamente em pushes para `main`
+  - Deploy manual disponível via GitHub Actions
+  - Inclui deploy das Netlify Functions
+
+### Configuração dos Secrets
+
+Para habilitar o deploy automático, configure os seguintes secrets no repositório:
+
+- `NETLIFY_AUTH_TOKEN`: Token de autenticação do Netlify
+- `NETLIFY_SITE_ID`: ID do site no Netlify
+
+📚 Para mais detalhes, consulte [.github/WORKFLOWS.md](.github/WORKFLOWS.md)
+
 ## 📄 Documentação
 
 A documentação técnica está disponível na pasta `docs/` com arquivos HTML detalhados para cada módulo.
