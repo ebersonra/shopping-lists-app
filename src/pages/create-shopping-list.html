@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Lista de Compras - Bargainly Shopping</title>
     <link rel="stylesheet" href="../../static/css/style.css">
-    <link rel="stylesheet" href="../../static/css/shopping-system.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="static/js/utils.js"></script>
     <style>
         /* Enhanced Create List Page - Dark Theme */
         body {
@@ -825,7 +823,6 @@
         </form>
     </main>
 
-    <script src="static/js/utils.js"></script>
     <script>
         // Global variables
         let itemCounter = 0;
@@ -848,6 +845,17 @@
             { value: 'cx', label: 'Caixa' },
             { value: 'pct', label: 'Pacote' }
         ];
+
+        // Get user ID from cookie (matching other pages pattern)
+        async function getUserId() {
+            const match = document.cookie.match(/(?:^|; )user_id=([^;]*)/);
+            if (match && match[1]) {
+                return decodeURIComponent(match[1]);
+            } else {
+                console.error('Usuário não autenticado (cookie user_id não encontrado)');
+                throw new Error('Usuário não autenticado');
+            }
+        }
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
@@ -873,6 +881,17 @@
             // Set today's date as default
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('shoppingDate').value = today;
+        }
+
+        // Load markets (simulated data for now)
+        async function loadMarkets() {
+            return [
+                { id: 1, nome: 'Supermercado Pão de Açúcar', endereco: 'Av. Paulista, 1234' },
+                { id: 2, nome: 'Extra Hiper', endereco: 'Rua das Flores, 567' },
+                { id: 3, nome: 'Carrefour', endereco: 'Shopping Center, Loja 89' },
+                { id: 4, nome: 'Atacadão', endereco: 'Av. Marginal, 890' },
+                { id: 5, nome: 'Big Bompreço', endereco: 'Rua do Comércio, 123' }
+            ];
         }
 
         // Load markets into select
