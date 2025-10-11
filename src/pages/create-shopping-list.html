@@ -879,10 +879,25 @@
             const userData = localStorage.getItem('bargainly_user');
             if (userData) {
                 currentUser = JSON.parse(userData);
+                
+                // Migration: If user data doesn't have user_id, generate one and update localStorage
+                if (!currentUser.user_id) {
+                    currentUser.user_id = generateUserId();
+                    localStorage.setItem('bargainly_user', JSON.stringify(currentUser));
+                }
             } else {
                 // Redirect to welcome page if no user data
                 window.location.href = 'shopping-welcome.html';
             }
+        }
+
+        // Generate UUID for user identification
+        function generateUserId() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
         }
 
         // Setup form defaults
