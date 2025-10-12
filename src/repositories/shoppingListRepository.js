@@ -91,10 +91,19 @@ async function getShoppingLists(user_id, options = {}) {
     throw new Error(`Invalid UUID format for user_id: ${user_id}`);
   }
   
+  // Query the base shopping_lists table directly with market join
+  // This is more reliable than querying the view for UUID columns after migration
   let query = supabase
-    .from('active_shopping_lists')
-    .select('*')
-    .eq('user_id', user_id);
+    .from('shopping_lists')
+    .select(`
+      *,
+      markets (
+        name,
+        address
+      )
+    `)
+    .eq('user_id', user_id)
+    .is('deleted_at', null);
   
   // Apply filters
   if (options.is_completed !== undefined) {
@@ -125,6 +134,42 @@ async function getShoppingLists(user_id, options = {}) {
     console.error('Query details - user_id:', user_id, 'options:', options);
     throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}${error.hint ? ' (Hint: ' + error.hint + ')' : ''}`);
   }
+  
+  // Fetch item counts for each list (since we're not using the view anymore)
+  if (data && data.length > 0) {
+    const listIds = data.map(list => list.id);
+    
+    // Get item counts for all lists
+    const { data: itemCounts } = await supabase
+      .from('shopping_list_items')
+      .select('list_id, is_checked')
+      .in('list_id', listIds);
+    
+    // Calculate counts per list
+    const countsMap = {};
+    if (itemCounts) {
+      itemCounts.forEach(item => {
+        if (!countsMap[item.list_id]) {
+          countsMap[item.list_id] = { total: 0, checked: 0 };
+        }
+        countsMap[item.list_id].total++;
+        if (item.is_checked) {
+          countsMap[item.list_id].checked++;
+        }
+      });
+    }
+    
+    // Add counts and market data to each list
+    return data.map(list => ({
+      ...list,
+      market_name: list.markets?.name || null,
+      market_address: list.markets?.address || null,
+      items_count: countsMap[list.id]?.total || 0,
+      checked_items_count: countsMap[list.id]?.checked || 0,
+      markets: undefined // Remove the nested markets object
+    }));
+  }
+  
   return data || [];
 }
 
@@ -146,12 +191,19 @@ async function getShoppingListById(id, user_id) {
     throw new Error(`Invalid UUID format for user_id: ${user_id}`);
   }
   
-  // Get the list
+  // Get the list from base table with market join
   const { data: list, error: listError } = await supabase
-    .from('active_shopping_lists')
-    .select('*')
+    .from('shopping_lists')
+    .select(`
+      *,
+      markets (
+        name,
+        address
+      )
+    `)
     .eq('id', id)
     .eq('user_id', user_id)
+    .is('deleted_at', null)
     .single();
   
   if (listError) {
@@ -170,8 +222,12 @@ async function getShoppingListById(id, user_id) {
   
   if (itemsError) throw new Error(itemsError.message);
   
+  // Transform list to match expected format (flatten markets)
   return {
     ...list,
+    market_name: list.markets?.name || null,
+    market_address: list.markets?.address || null,
+    markets: undefined,
     items: items || []
   };
 }
