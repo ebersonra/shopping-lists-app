@@ -85,10 +85,25 @@ async function createShoppingList(listData, items = []) {
 async function getShoppingLists(user_id, options = {}) {
   const supabase = getClient();
   
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!user_id || !uuidRegex.test(user_id)) {
+    throw new Error(`Invalid UUID format for user_id: ${user_id}`);
+  }
+  
+  // Query the base shopping_lists table directly with market join
+  // This is more reliable than querying the view for UUID columns after migration
   let query = supabase
-    .from('active_shopping_lists')
-    .select('*')
-    .eq('user_id', user_id);
+    .from('shopping_lists')
+    .select(`
+      *,
+      markets (
+        name,
+        address
+      )
+    `)
+    .eq('user_id', user_id)
+    .is('deleted_at', null);
   
   // Apply filters
   if (options.is_completed !== undefined) {
@@ -114,7 +129,47 @@ async function getShoppingLists(user_id, options = {}) {
   
   const { data, error } = await query;
   
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error('Supabase query error:', error);
+    console.error('Query details - user_id:', user_id, 'options:', options);
+    throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}${error.hint ? ' (Hint: ' + error.hint + ')' : ''}`);
+  }
+  
+  // Fetch item counts for each list (since we're not using the view anymore)
+  if (data && data.length > 0) {
+    const listIds = data.map(list => list.id);
+    
+    // Get item counts for all lists
+    const { data: itemCounts } = await supabase
+      .from('shopping_list_items')
+      .select('list_id, is_checked')
+      .in('list_id', listIds);
+    
+    // Calculate counts per list
+    const countsMap = {};
+    if (itemCounts) {
+      itemCounts.forEach(item => {
+        if (!countsMap[item.list_id]) {
+          countsMap[item.list_id] = { total: 0, checked: 0 };
+        }
+        countsMap[item.list_id].total++;
+        if (item.is_checked) {
+          countsMap[item.list_id].checked++;
+        }
+      });
+    }
+    
+    // Add counts and market data to each list
+    return data.map(list => ({
+      ...list,
+      market_name: list.markets?.name || null,
+      market_address: list.markets?.address || null,
+      items_count: countsMap[list.id]?.total || 0,
+      checked_items_count: countsMap[list.id]?.checked || 0,
+      markets: undefined // Remove the nested markets object
+    }));
+  }
+  
   return data || [];
 }
 
@@ -127,17 +182,34 @@ async function getShoppingLists(user_id, options = {}) {
 async function getShoppingListById(id, user_id) {
   const supabase = getClient();
   
-  // Get the list
+  // Validate UUID formats
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!id || !uuidRegex.test(id)) {
+    throw new Error(`Invalid UUID format for id: ${id}`);
+  }
+  if (!user_id || !uuidRegex.test(user_id)) {
+    throw new Error(`Invalid UUID format for user_id: ${user_id}`);
+  }
+  
+  // Get the list from base table with market join
   const { data: list, error: listError } = await supabase
-    .from('active_shopping_lists')
-    .select('*')
+    .from('shopping_lists')
+    .select(`
+      *,
+      markets (
+        name,
+        address
+      )
+    `)
     .eq('id', id)
     .eq('user_id', user_id)
+    .is('deleted_at', null)
     .single();
   
   if (listError) {
     if (listError.code === 'PGRST116') return null; // Not found
-    throw new Error(listError.message);
+    console.error('Supabase query error:', listError);
+    throw new Error(`Database error: ${listError.message}${listError.details ? ' - ' + listError.details : ''}`);
   }
   
   // Get the items
@@ -150,8 +222,12 @@ async function getShoppingListById(id, user_id) {
   
   if (itemsError) throw new Error(itemsError.message);
   
+  // Transform list to match expected format (flatten markets)
   return {
     ...list,
+    market_name: list.markets?.name || null,
+    market_address: list.markets?.address || null,
+    markets: undefined,
     items: items || []
   };
 }
@@ -189,6 +265,15 @@ async function getShoppingListByShareCode(shareCode) {
 async function updateShoppingList(id, user_id, updates) {
   const supabase = getClient();
   
+  // Validate UUID formats
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!id || !uuidRegex.test(id)) {
+    throw new Error(`Invalid UUID format for id: ${id}`);
+  }
+  if (!user_id || !uuidRegex.test(user_id)) {
+    throw new Error(`Invalid UUID format for user_id: ${user_id}`);
+  }
+  
   const { data, error } = await supabase
     .from('shopping_lists')
     .update({
@@ -200,7 +285,10 @@ async function updateShoppingList(id, user_id, updates) {
     .select()
     .single();
   
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error('Supabase update error:', error);
+    throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}`);
+  }
   return data;
 }
 
@@ -213,6 +301,15 @@ async function updateShoppingList(id, user_id, updates) {
 async function deleteShoppingList(id, user_id) {
   const supabase = getClient();
   
+  // Validate UUID formats
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!id || !uuidRegex.test(id)) {
+    throw new Error(`Invalid UUID format for id: ${id}`);
+  }
+  if (!user_id || !uuidRegex.test(user_id)) {
+    throw new Error(`Invalid UUID format for user_id: ${user_id}`);
+  }
+  
   const { data, error } = await supabase
     .from('shopping_lists')
     .update({
@@ -223,7 +320,10 @@ async function deleteShoppingList(id, user_id) {
     .select()
     .single();
   
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error('Supabase delete error:', error);
+    throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}`);
+  }
   return data;
 }
 
