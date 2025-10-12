@@ -85,6 +85,12 @@ async function createShoppingList(listData, items = []) {
 async function getShoppingLists(user_id, options = {}) {
   const supabase = getClient();
   
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!user_id || !uuidRegex.test(user_id)) {
+    throw new Error(`Invalid UUID format for user_id: ${user_id}`);
+  }
+  
   let query = supabase
     .from('active_shopping_lists')
     .select('*')
@@ -114,7 +120,11 @@ async function getShoppingLists(user_id, options = {}) {
   
   const { data, error } = await query;
   
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error('Supabase query error:', error);
+    console.error('Query details - user_id:', user_id, 'options:', options);
+    throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}${error.hint ? ' (Hint: ' + error.hint + ')' : ''}`);
+  }
   return data || [];
 }
 
@@ -127,6 +137,15 @@ async function getShoppingLists(user_id, options = {}) {
 async function getShoppingListById(id, user_id) {
   const supabase = getClient();
   
+  // Validate UUID formats
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!id || !uuidRegex.test(id)) {
+    throw new Error(`Invalid UUID format for id: ${id}`);
+  }
+  if (!user_id || !uuidRegex.test(user_id)) {
+    throw new Error(`Invalid UUID format for user_id: ${user_id}`);
+  }
+  
   // Get the list
   const { data: list, error: listError } = await supabase
     .from('active_shopping_lists')
@@ -137,7 +156,8 @@ async function getShoppingListById(id, user_id) {
   
   if (listError) {
     if (listError.code === 'PGRST116') return null; // Not found
-    throw new Error(listError.message);
+    console.error('Supabase query error:', listError);
+    throw new Error(`Database error: ${listError.message}${listError.details ? ' - ' + listError.details : ''}`);
   }
   
   // Get the items
@@ -189,6 +209,15 @@ async function getShoppingListByShareCode(shareCode) {
 async function updateShoppingList(id, user_id, updates) {
   const supabase = getClient();
   
+  // Validate UUID formats
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!id || !uuidRegex.test(id)) {
+    throw new Error(`Invalid UUID format for id: ${id}`);
+  }
+  if (!user_id || !uuidRegex.test(user_id)) {
+    throw new Error(`Invalid UUID format for user_id: ${user_id}`);
+  }
+  
   const { data, error } = await supabase
     .from('shopping_lists')
     .update({
@@ -200,7 +229,10 @@ async function updateShoppingList(id, user_id, updates) {
     .select()
     .single();
   
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error('Supabase update error:', error);
+    throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}`);
+  }
   return data;
 }
 
@@ -213,6 +245,15 @@ async function updateShoppingList(id, user_id, updates) {
 async function deleteShoppingList(id, user_id) {
   const supabase = getClient();
   
+  // Validate UUID formats
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!id || !uuidRegex.test(id)) {
+    throw new Error(`Invalid UUID format for id: ${id}`);
+  }
+  if (!user_id || !uuidRegex.test(user_id)) {
+    throw new Error(`Invalid UUID format for user_id: ${user_id}`);
+  }
+  
   const { data, error } = await supabase
     .from('shopping_lists')
     .update({
@@ -223,7 +264,10 @@ async function deleteShoppingList(id, user_id) {
     .select()
     .single();
   
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error('Supabase delete error:', error);
+    throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}`);
+  }
   return data;
 }
 
