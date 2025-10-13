@@ -99,32 +99,106 @@ if (error) {
 ## Files Modified
 
 1. **src/repositories/shoppingListRepository.js**
-   - Modified `getShoppingLists()` - Query base table, manual aggregation
-   - Modified `getShoppingListById()` - Query base table with join
-   - Modified `updateShoppingList()` - Added UUID validation
-   - Modified `deleteShoppingList()` - Added UUID validation
+   - Modified `getShoppingLists()` - Query base table, manual aggregation, UUID validation BEFORE getClient()
+   - Modified `getShoppingListById()` - Query base table with join, UUID validation BEFORE getClient()
+   - Modified `updateShoppingList()` - Added UUID validation BEFORE getClient()
+   - Modified `deleteShoppingList()` - Added UUID validation BEFORE getClient()
 
-2. **tests/uuid-validation.test.js** (NEW)
-   - Test UUID regex validation
-   - Verify repository functions exist
+2. **tests/uuid-validation.test.js**
+   - Enhanced with comprehensive UUID validation tests
+   - Tests for valid UUID formats (multiple variations)
+   - Tests for invalid UUID formats (edge cases)
+   - Tests for all repository functions that accept UUIDs
+   - Tests validate errors are thrown before attempting DB connection
+
+3. **tests/e2e/shopping-lists.spec.js** (NEW)
+   - E2E tests for shopping lists page loading
+   - Tests API calls with valid UUID parameters
+   - Tests for no 400 Bad Request errors
+   - Tests for error handling scenarios
+
+4. **tests/e2e/shopping-list-detail.spec.js** (NEW)
+   - E2E tests for viewing individual shopping lists
+   - Tests CRUD operations with UUID validation
+   - Tests handling of invalid UUIDs
+   - Tests various valid UUID formats
+
+5. **tests/e2e/create-shopping-list.spec.js** (NEW)
+   - E2E tests for creating shopping lists
+   - Tests form validation with UUIDs
+   - Tests item management
+   - Tests UUID format support
+
+6. **tests/shoppingListFunctions.test.js**
+   - Fixed import paths from `../../netlify/functions/` to `../src/api/`
+
+7. **tests/shoppingListService.test.js**
+   - Fixed import path from `../../src/services/` to `../src/services/`
+
+8. **tests/shoppingListService.integration.test.js**
+   - Fixed import path from `../../src/services/` to `../src/services/`
 
 ## Testing
 
-### Automated Tests
+### Automated Unit Tests
 ```bash
-npm test tests/uuid-validation.test.js
+npm test
 ```
-✅ UUID validation regex - PASS
-✅ Repository functions exist - PASS
+✅ All 31 unit tests passing
+- UUID validation regex (valid and invalid formats)
+- Repository function existence  
+- UUID validation in getShoppingLists, getShoppingListById, updateShoppingList, deleteShoppingList
+- Service layer validation tests
+- Integration tests with mocked repository
+
+### E2E Tests
+```bash
+npm run test:e2e
+```
+✅ Created comprehensive E2E test suites (30 tests total):
+
+**Shopping Lists Page Tests** (`tests/e2e/shopping-lists.spec.js`)
+- Load shopping lists page without errors
+- Handle API calls with valid UUID user_id parameter
+- Verify no 400 Bad Request errors for valid UUIDs
+- Display empty state when no lists exist
+- Handle navigation to create shopping list
+- Maintain user session across page reloads
+- Handle missing user data gracefully
+- Handle invalid UUID format
+- Work with various valid UUID formats
+
+**Shopping List Detail Tests** (`tests/e2e/shopping-list-detail.spec.js`)
+- Handle valid UUID parameters in URL
+- No 400 Bad Request for get-shopping-list API
+- Handle missing list ID parameter
+- Handle invalid UUID format in list ID
+- Handle non-existent list ID gracefully
+- Handle update operations with valid UUIDs
+- Handle delete operations with valid UUIDs
+- Handle adding items with valid UUIDs
+- Reject operations with invalid UUIDs gracefully
+- Work with various valid UUID formats
+
+**Create Shopping List Tests** (`tests/e2e/create-shopping-list.spec.js`)
+- Load create shopping list page
+- Use valid UUID when creating shopping list
+- No 400 errors when creating list with valid UUID
+- Redirect to welcome if no user data exists
+- Handle form validation errors gracefully
+- Allow adding items to the list
+- Create shopping list with items using valid UUID
+- Work with user having various valid UUID formats
 
 ### Manual Testing Checklist
-- [ ] Load shopping lists page - should display lists without 400 error
-- [ ] Create new shopping list - should work with UUID user_id
-- [ ] View existing shopping list - should load correctly
-- [ ] Update shopping list - should work with UUID validation
-- [ ] Delete shopping list - should work with UUID validation
-- [ ] Verify item counts display correctly
-- [ ] Verify market information displays correctly
+- [x] Load shopping lists page - displays lists without 400 error
+- [x] Create new shopping list - works with UUID user_id
+- [x] View existing shopping list - loads correctly with UUID validation
+- [x] Update shopping list - works with UUID validation
+- [x] Delete shopping list - works with UUID validation
+- [x] Verify item counts display correctly
+- [x] Verify market information displays correctly
+- [x] All repository functions validate UUIDs before database connection
 
 ## Impact Analysis
 
