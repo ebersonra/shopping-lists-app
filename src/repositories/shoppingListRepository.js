@@ -91,83 +91,22 @@ async function getShoppingLists(user_id, options = {}) {
   
   const supabase = getClient();
   
-  // Query the base shopping_lists table directly with market join
-  // This is more reliable than querying the view for UUID columns after migration
-  let query = supabase
-    .from('shopping_lists')
-    .select(`
-      *,
-      markets (
-        name,
-        address
-      )
-    `)
-    .eq('user_id', user_id)
-    .is('deleted_at', null);
-  
-  // Apply filters
-  if (options.is_completed !== undefined) {
-    query = query.eq('is_completed', options.is_completed);
-  }
-  
-  if (options.market_id) {
-    query = query.eq('market_id', options.market_id);
-  }
-  
-  // Apply ordering
-  const orderBy = options.orderBy || 'created_at';
-  const orderDirection = options.orderDirection || 'desc';
-  query = query.order(orderBy, { ascending: orderDirection === 'asc' });
-  
-  // Apply pagination
-  if (options.limit) {
-    query = query.limit(options.limit);
-    if (options.offset) {
-      query = query.range(options.offset, options.offset + options.limit - 1);
-    }
-  }
-  
-  const { data, error } = await query;
+  // Use RPC function for better UUID handling
+  // This avoids the 400 error when querying with UUID columns
+  const { data, error } = await supabase.rpc('get_shopping_lists_by_user', {
+    p_user_id: user_id,
+    p_limit: options.limit || null,
+    p_offset: options.offset || null,
+    p_is_completed: options.is_completed !== undefined ? options.is_completed : null,
+    p_market_id: options.market_id || null,
+    p_order_by: options.orderBy || 'created_at',
+    p_order_direction: options.orderDirection || 'desc'
+  });
   
   if (error) {
-    console.error('Supabase query error:', error);
+    console.error('Supabase RPC error:', error);
     console.error('Query details - user_id:', user_id, 'options:', options);
     throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}${error.hint ? ' (Hint: ' + error.hint + ')' : ''}`);
-  }
-  
-  // Fetch item counts for each list (since we're not using the view anymore)
-  if (data && data.length > 0) {
-    const listIds = data.map(list => list.id);
-    
-    // Get item counts for all lists
-    const { data: itemCounts } = await supabase
-      .from('shopping_list_items')
-      .select('list_id, is_checked')
-      .in('list_id', listIds);
-    
-    // Calculate counts per list
-    const countsMap = {};
-    if (itemCounts) {
-      itemCounts.forEach(item => {
-        if (!countsMap[item.list_id]) {
-          countsMap[item.list_id] = { total: 0, checked: 0 };
-        }
-        countsMap[item.list_id].total++;
-        if (item.is_checked) {
-          countsMap[item.list_id].checked++;
-        }
-      });
-    }
-    
-    // Add counts and market data to each list
-    return data.map(list => ({
-      ...list,
-      market_name: list.markets?.name || null,
-      market_address: list.markets?.address || null,
-      items_count: countsMap[list.id]?.total || 0,
-      checked_items_count: countsMap[list.id]?.checked || 0,
-      markets: undefined // Remove the nested markets object
-    }));
   }
   
   return data || [];

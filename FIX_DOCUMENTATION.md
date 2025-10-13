@@ -14,17 +14,11 @@ When the repository code queries the view with `.eq('user_id', string_value)`, P
 
 ## Solution Implemented
 
-### 1. Query Base Tables Instead of Views
-Changed from querying the `active_shopping_lists` view to querying the base `shopping_lists` table directly:
+### 1. Use RPC Function Instead of Direct Queries
+Changed from querying the `shopping_lists` table directly to using an RPC (Remote Procedure Call) function:
 
 ```javascript
-// Before (querying view)
-let query = supabase
-  .from('active_shopping_lists')
-  .select('*')
-  .eq('user_id', user_id);
-
-// After (querying base table with explicit joins)
+// Before (direct table query)
 let query = supabase
   .from('shopping_lists')
   .select(`
@@ -36,37 +30,27 @@ let query = supabase
   `)
   .eq('user_id', user_id)
   .is('deleted_at', null);
-```
 
-This approach is more reliable because:
-- Base tables handle UUID casting more consistently than views
-- Avoids view schema caching issues
-- More explicit about what data we're fetching
-
-### 2. Manual Aggregation of Item Counts
-Since we're no longer using the view that includes aggregated counts, we manually fetch and calculate:
-
-```javascript
-// Fetch item counts for all lists
-const { data: itemCounts } = await supabase
-  .from('shopping_list_items')
-  .select('list_id, is_checked')
-  .in('list_id', listIds);
-
-// Calculate counts per list
-const countsMap = {};
-itemCounts.forEach(item => {
-  if (!countsMap[item.list_id]) {
-    countsMap[item.list_id] = { total: 0, checked: 0 };
-  }
-  countsMap[item.list_id].total++;
-  if (item.is_checked) {
-    countsMap[item.list_id].checked++;
-  }
+// After (using RPC function)
+const { data, error } = await supabase.rpc('get_shopping_lists_by_user', {
+  p_user_id: user_id,
+  p_limit: options.limit || null,
+  p_offset: options.offset || null,
+  p_is_completed: options.is_completed !== undefined ? options.is_completed : null,
+  p_market_id: options.market_id || null,
+  p_order_by: options.orderBy || 'created_at',
+  p_order_direction: options.orderDirection || 'desc'
 });
 ```
 
-### 3. UUID Format Validation
+This approach is more reliable because:
+- RPC functions handle UUID casting automatically on the PostgreSQL side
+- The function explicitly casts the string parameter to UUID: `WHERE sl.user_id = p_user_id::UUID`
+- Eliminates the 400 Bad Request error caused by PostgREST's UUID casting issues
+- Provides better control over the query and aggregations
+- More performant as the aggregations (item counts) are done in a single query
+
+### 2. UUID Format Validation
 Added validation to catch invalid UUID formats early with helpful error messages:
 
 ```javascript
@@ -76,67 +60,83 @@ if (!user_id || !uuidRegex.test(user_id)) {
 }
 ```
 
-Applied to all repository functions that accept user_id:
+Applied validation BEFORE attempting database connection in all repository functions:
 - `getShoppingLists()`
 - `getShoppingListById()`
 - `updateShoppingList()`
 - `deleteShoppingList()`
 
-### 4. Enhanced Error Messages
-Improved error messages to include Supabase error details:
+### 3. Enhanced Error Handling
+Improved error responses in API layer to return appropriate HTTP status codes:
+- 400 for client errors (invalid UUID, bad parameters)
+- 404 for not found errors
+- 403 for unauthorized access
+- 500 for server/database errors
 
 ```javascript
-if (error) {
-  console.error('Supabase query error:', error);
-  throw new Error(
-    `Database error: ${error.message}` +
-    `${error.details ? ' - ' + error.details : ''}` +
-    `${error.hint ? ' (Hint: ' + error.hint + ')' : ''}`
-  );
+// Determine appropriate status code based on error type
+let statusCode = 500; // Default to server error
+
+if (e.message.includes('Invalid UUID format') || 
+    e.message.includes('User ID is required')) {
+  statusCode = 400;
+} else if (e.message.includes('not found')) {
+  statusCode = 404;
 }
 ```
 
 ## Files Modified
 
 1. **src/repositories/shoppingListRepository.js**
-   - Modified `getShoppingLists()` - Query base table, manual aggregation, UUID validation BEFORE getClient()
+   - Modified `getShoppingLists()` - Now uses RPC function `get_shopping_lists_by_user` instead of direct table query
    - Modified `getShoppingListById()` - Query base table with join, UUID validation BEFORE getClient()
    - Modified `updateShoppingList()` - Added UUID validation BEFORE getClient()
    - Modified `deleteShoppingList()` - Added UUID validation BEFORE getClient()
 
-2. **tests/uuid-validation.test.js**
+2. **database/get_shopping_lists_by_user_rpc.sql** (NEW)
+   - RPC function to get shopping lists with proper UUID handling
+   - Handles UUID casting on PostgreSQL side: `WHERE sl.user_id = p_user_id::UUID`
+   - Includes item count aggregations in single query
+   - Supports filtering, ordering, and pagination
+
+3. **src/api/get-shopping-lists.js**
+   - Enhanced error handling with appropriate HTTP status codes
+   - Returns 400 for client errors, 500 for server errors, 404 for not found
+   - Added detailed error logging
+
+4. **tests/uuid-validation.test.js**
    - Enhanced with comprehensive UUID validation tests
    - Tests for valid UUID formats (multiple variations)
    - Tests for invalid UUID formats (edge cases)
    - Tests for all repository functions that accept UUIDs
    - Tests validate errors are thrown before attempting DB connection
 
-3. **tests/e2e/shopping-lists.spec.js** (NEW)
+5. **tests/e2e/shopping-lists.spec.js** (NEW)
    - E2E tests for shopping lists page loading
    - Tests API calls with valid UUID parameters
    - Tests for no 400 Bad Request errors
    - Tests for error handling scenarios
 
-4. **tests/e2e/shopping-list-detail.spec.js** (NEW)
+6. **tests/e2e/shopping-list-detail.spec.js** (NEW)
    - E2E tests for viewing individual shopping lists
    - Tests CRUD operations with UUID validation
    - Tests handling of invalid UUIDs
    - Tests various valid UUID formats
 
-5. **tests/e2e/create-shopping-list.spec.js** (NEW)
+7. **tests/e2e/create-shopping-list.spec.js** (NEW)
    - E2E tests for creating shopping lists
    - Tests form validation with UUIDs
    - Tests item management
    - Tests UUID format support
 
-6. **tests/shoppingListFunctions.test.js**
+8. **tests/shoppingListFunctions.test.js**
    - Fixed import paths from `../../netlify/functions/` to `../src/api/`
 
-7. **tests/shoppingListService.test.js**
+9. **tests/shoppingListService.test.js**
    - Fixed import path from `../../src/services/` to `../src/services/`
 
-8. **tests/shoppingListService.integration.test.js**
-   - Fixed import path from `../../src/services/` to `../src/services/`
+10. **tests/shoppingListService.integration.test.js**
+    - Fixed import path from `../../src/services/` to `../src/services/`
 
 ## Testing
 
