@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="shopping-welcome-container">
@@ -114,6 +117,12 @@
         </div>
     </div>
 
+    <!-- Configuration (must be loaded first) -->
+    <script src="../utils/config.js"></script>
+    
+    <!-- Supabase Utilities -->
+    <script src="../utils/supabaseClient.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('welcomeForm');
@@ -121,6 +130,10 @@
             const marketSelect = document.getElementById('preferredMarket');
             const marketInfo = document.getElementById('marketInfo');
             const phoneInput = document.getElementById('userPhone');
+
+            // Initialize Supabase
+            console.log('🚀 Initializing Supabase...');
+            SupabaseUtils.initSupabase();
 
             // Máscara de telefone
             phoneInput.addEventListener('input', function(e) {
@@ -158,53 +171,116 @@
                 return `(${prefix}) 9${number.toString().substring(0, 4)}-${number.toString().substring(4)}`;
             }
 
-            // Função para gerar UUID simples
-            function generateUserId() {
-                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                    const r = Math.random() * 16 | 0;
-                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                    return v.toString(16);
-                });
-            }
+            /**
+             * Process user data and redirect to main page
+             * Gets or creates user in Supabase database
+             */
+            async function processAndRedirect(name, phone, skipped = false) {
+                try {
+                    console.log('📝 Processing user data...');
+                    
+                    // Show loading state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span>Processando...</span>';
+                    skipBtn.disabled = true;
 
-            // Função para processar e redirecionar
-            function processAndRedirect(name, phone, skipped = false) {
-                const userData = {
-                    user_id: generateUserId(),
-                    name: name,
-                    phone: phone,
-                    market: marketSelect.value || 'outros',
-                    skipped: skipped,
-                    timestamp: new Date().toISOString()
-                };
+                    // Prepare user data
+                    const cleanPhone = phone.replace(/\D/g, '');
+                    
+                    // Get or create user in database
+                    const user = await SupabaseUtils.getOrCreateUser({
+                        name: name,
+                        phone: cleanPhone,
+                        email: null,
+                        preferred_market_id: null, // Will be set after market creation
+                        skipped_onboarding: skipped
+                    });
 
-                // Salvar no localStorage
-                localStorage.setItem('bargainly_user', JSON.stringify(userData));
+                    if (!user) {
+                        throw new Error('Failed to create or retrieve user');
+                    }
 
-                // Redirecionar para a página principal
-                window.location.href = 'shopping-lists.html';
+                    console.log('✅ User retrieved/created:', user);
+
+                    // Handle preferred market
+                    let marketId = null;
+                    const selectedMarket = marketSelect.value;
+                    
+                    if (selectedMarket && selectedMarket !== '') {
+                        console.log('🏪 Processing preferred market:', selectedMarket);
+                        marketId = await SupabaseUtils.findOrCreateMarket(selectedMarket, user.id);
+                        
+                        if (marketId) {
+                            // Update user with preferred market
+                            await SupabaseUtils.updateUser(user.id, {
+                                preferred_market_id: marketId
+                            });
+                            console.log('✅ User updated with preferred market');
+                        }
+                    }
+
+                    // Prepare data for localStorage (for quick access on other pages)
+                    const userData = {
+                        user_id: user.id,
+                        name: user.name || name,
+                        phone: cleanPhone,
+                        email: user.email,
+                        preferred_market_id: marketId,
+                        preferred_market_name: selectedMarket,
+                        skipped_onboarding: skipped,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    // Save to localStorage
+                    localStorage.setItem('bargainly_user', JSON.stringify(userData));
+                    console.log('💾 User data saved to localStorage');
+
+                    // Show success message
+                    submitBtn.innerHTML = '<span>✅ Sucesso! Redirecionando...</span>';
+                    
+                    // Redirect to main page
+                    setTimeout(() => {
+                        window.location.href = 'shopping-lists.html';
+                    }, 500);
+
+                } catch (error) {
+                    console.error('❌ Error processing user:', error);
+                    
+                    // Show error message
+                    alert('Ocorreu um erro ao processar seus dados. Tente novamente.');
+                    
+                    // Reset button state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                    skipBtn.disabled = false;
+                }
             }
 
             // Envio do formulário
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                console.log('Formulário enviado');
+                console.log('📋 Form submitted');
                 
-                const userName = document.getElementById('userName').value || generateRandomName();
-                const userPhone = document.getElementById('userPhone').value || generateRandomPhone();
+                const userName = document.getElementById('userName').value.trim() || generateRandomName();
+                const userPhone = document.getElementById('userPhone').value.trim() || generateRandomPhone();
                 
-                console.log('Nome:', userName, 'Telefone:', userPhone);
+                console.log('👤 Name:', userName, '📱 Phone:', userPhone);
                 
-                processAndRedirect(userName, userPhone);
+                await processAndRedirect(userName, userPhone, false);
             });
 
             // Botão de pular
-            skipBtn.addEventListener('click', function(e) {
+            skipBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
-                console.log('Botão pular clicado');
+                console.log('⏭️ Skip button clicked');
+                
                 const name = generateRandomName();
                 const phone = generateRandomPhone();
-                processAndRedirect(name, phone, true);
+                
+                await processAndRedirect(name, phone, true);
             });
         });
     </script>
