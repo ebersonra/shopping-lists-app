@@ -1,6 +1,9 @@
 .env
 !.env.dev
 
+# Generated environment file
+src/utils/env.js
+
 node_modules/
 # Local Netlify folder
 .netlify

@@ -27,8 +27,10 @@ const requiredVars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'];
 const missingVars = requiredVars.filter(varName => !ENV[varName]);
 
 if (missingVars.length > 0) {
-    console.error('❌ Missing required environment variables:', missingVars);
-    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+    console.warn('⚠️  Missing environment variables:', missingVars);
+    console.warn('   The app may not work correctly without these variables.');
+    console.warn('   For local development, create a .env file with your credentials.');
+    console.warn('   For production, set environment variables in your deployment platform.');
 }
 
 // Log configuration in development

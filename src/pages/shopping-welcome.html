@@ -117,7 +117,10 @@
         </div>
     </div>
 
-    <!-- Configuration (must be loaded first) -->
+    <!-- Environment variables (injected at build time) -->
+    <script src="/src/utils/env.js"></script>
+    
+    <!-- Configuration (must be loaded after env.js) -->
     <script src="/src/utils/config.js"></script>
     
     <!-- Supabase Utilities -->
