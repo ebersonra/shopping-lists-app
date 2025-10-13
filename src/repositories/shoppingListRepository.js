@@ -83,13 +83,13 @@ async function createShoppingList(listData, items = []) {
  * @returns {Array} - Array of shopping lists
  */
 async function getShoppingLists(user_id, options = {}) {
-  const supabase = getClient();
-  
-  // Validate UUID format
+  // Validate UUID format before attempting database connection
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!user_id || !uuidRegex.test(user_id)) {
     throw new Error(`Invalid UUID format for user_id: ${user_id}`);
   }
+  
+  const supabase = getClient();
   
   // Query the base shopping_lists table directly with market join
   // This is more reliable than querying the view for UUID columns after migration
@@ -180,9 +180,7 @@ async function getShoppingLists(user_id, options = {}) {
  * @returns {Object|null} - Shopping list with items or null if not found
  */
 async function getShoppingListById(id, user_id) {
-  const supabase = getClient();
-  
-  // Validate UUID formats
+  // Validate UUID formats before attempting database connection
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
     throw new Error(`Invalid UUID format for id: ${id}`);
@@ -190,6 +188,8 @@ async function getShoppingListById(id, user_id) {
   if (!user_id || !uuidRegex.test(user_id)) {
     throw new Error(`Invalid UUID format for user_id: ${user_id}`);
   }
+  
+  const supabase = getClient();
   
   // Get the list from base table with market join
   const { data: list, error: listError } = await supabase
@@ -263,9 +263,7 @@ async function getShoppingListByShareCode(shareCode) {
  * @returns {Object} - Updated shopping list
  */
 async function updateShoppingList(id, user_id, updates) {
-  const supabase = getClient();
-  
-  // Validate UUID formats
+  // Validate UUID formats before attempting database connection
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
     throw new Error(`Invalid UUID format for id: ${id}`);
@@ -273,6 +271,8 @@ async function updateShoppingList(id, user_id, updates) {
   if (!user_id || !uuidRegex.test(user_id)) {
     throw new Error(`Invalid UUID format for user_id: ${user_id}`);
   }
+  
+  const supabase = getClient();
   
   const { data, error } = await supabase
     .from('shopping_lists')
@@ -299,9 +299,7 @@ async function updateShoppingList(id, user_id, updates) {
  * @returns {Object} - Deleted shopping list
  */
 async function deleteShoppingList(id, user_id) {
-  const supabase = getClient();
-  
-  // Validate UUID formats
+  // Validate UUID formats before attempting database connection
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
     throw new Error(`Invalid UUID format for id: ${id}`);
@@ -309,6 +307,8 @@ async function deleteShoppingList(id, user_id) {
   if (!user_id || !uuidRegex.test(user_id)) {
     throw new Error(`Invalid UUID format for user_id: ${user_id}`);
   }
+  
+  const supabase = getClient();
   
   const { data, error } = await supabase
     .from('shopping_lists')
