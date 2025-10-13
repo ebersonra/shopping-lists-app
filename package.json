@@ -20,7 +20,7 @@
   "scripts": {
     "start": "live-server . --port=3000 --open=/index.html",
     "dev": "netlify dev",
-    "build": "echo 'Build completed - static files ready for deployment'",
+    "build": "node scripts/inject-env.js",
     "test": "node --test tests/",
     "test:unit": "node --test tests/ --reporter=spec",
     "test:integration": "node --test tests/ --grep='integration'",

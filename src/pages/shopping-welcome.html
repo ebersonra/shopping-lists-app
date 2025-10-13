@@ -117,11 +117,14 @@
         </div>
     </div>
 
-    <!-- Configuration (must be loaded first) -->
-    <script src="../utils/config.js"></script>
+    <!-- Environment variables (injected at build time) -->
+    <script src="/src/utils/env.js"></script>
+    
+    <!-- Configuration (must be loaded after env.js) -->
+    <script src="/src/utils/config.js"></script>
     
     <!-- Supabase Utilities -->
-    <script src="../utils/supabaseClient.js"></script>
+    <script src="/src/utils/supabaseClient.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

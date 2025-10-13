@@ -14,13 +14,19 @@ Este projeto usa variáveis de ambiente para gerenciar configurações sensívei
 ## 🏗️ Arquitetura da Configuração
 
 ```
-.env (não commitado)
+Environment Variables (Netlify/Vercel)
     ↓
-config.js (carrega variáveis)
+npm run build (scripts/inject-env.js)
     ↓
-window.APP_ENV (disponível globalmente)
+src/utils/env.js (generated at build time)
     ↓
-supabaseClient.js (usa configuração)
+window.ENV (available in browser)
+    ↓
+config.js (reads window.ENV)
+    ↓
+window.APP_ENV (available to app)
+    ↓
+supabaseClient.js (uses window.APP_ENV)
     ↓
 Outros módulos
 ```
@@ -45,7 +51,18 @@ SUPABASE_URL=https://your-project-id.supabase.co
 SUPABASE_ANON_KEY=your_anon_key_here
 ```
 
-### 3. `src/utils/config.js` (Commitado)
+### 3. `src/utils/env.js` (Gerado no Build)
+Arquivo gerado automaticamente pelo build script. **NÃO commitar este arquivo!**
+
+```javascript
+window.ENV = {
+    SUPABASE_URL: 'https://qtrbojicgwzbnolktwjp.supabase.co',
+    SUPABASE_ANON_KEY: 'eyJhbGci...',
+    NODE_ENV: 'production'
+};
+```
+
+### 4. `src/utils/config.js` (Commitado)
 Carrega e valida as variáveis de ambiente.
 
 ```javascript
@@ -59,7 +76,7 @@ const ENV = {
 
 ## 🚀 Setup Inicial
 
-### 1️⃣ Criar arquivo `.env`
+### 1️⃣ Criar arquivo `.env` (para desenvolvimento local)
 
 ```bash
 # Copiar o template
@@ -78,16 +95,25 @@ SUPABASE_URL=https://qtrbojicgwzbnolktwjp.supabase.co
 SUPABASE_ANON_KEY=eyJhbGci... (copie da página de API Settings)
 ```
 
-### 3️⃣ Verificar `.gitignore`
-
-Certifique-se que `.env` está ignorado:
+### 3️⃣ Executar o build
 
 ```bash
-# Verificar se .env está no .gitignore
-grep ".env" .gitignore
+npm run build
+```
 
-# Se não estiver, adicione:
-echo ".env" >> .gitignore
+Isso irá gerar o arquivo `src/utils/env.js` com suas credenciais.
+
+### 4️⃣ Verificar `.gitignore`
+
+Certifique-se que `.env` e `src/utils/env.js` estão ignorados:
+
+```bash
+# Verificar se estão no .gitignore
+grep -E "\.env|env\.js" .gitignore
+
+# Deve mostrar:
+# .env
+# src/utils/env.js
 ```
 
 ---
@@ -96,20 +122,48 @@ echo ".env" >> .gitignore
 
 ### Desenvolvimento Local
 
-**1. HTML carrega config.js:**
-```html
-<script src="../utils/config.js"></script>
+**1. Definir variáveis de ambiente:**
+```bash
+# Opção 1: Criar .env e executar build
+cp .env.example .env
+# Editar .env com suas credenciais
+npm run build
+
+# Opção 2: Definir inline
+SUPABASE_URL="https://qtrbojicgwzbnolktwjp.supabase.co" \
+SUPABASE_ANON_KEY="your_key" \
+npm run build
 ```
 
-**2. config.js define window.APP_ENV:**
+**2. HTML carrega env.js (gerado pelo build):**
+```html
+<script src="/src/utils/env.js"></script>
+```
+
+**3. env.js define window.ENV:**
+**3. env.js define window.ENV:**
 ```javascript
-window.APP_ENV = {
+window.ENV = {
     SUPABASE_URL: 'https://qtrbojicgwzbnolktwjp.supabase.co',
-    SUPABASE_ANON_KEY: 'eyJhbGci...'
+    SUPABASE_ANON_KEY: 'eyJhbGci...',
+    NODE_ENV: 'production'
 };
 ```
 
-**3. supabaseClient.js usa window.APP_ENV:**
+**4. HTML carrega config.js:**
+```html
+<script src="/src/utils/config.js"></script>
+```
+
+**5. config.js define window.APP_ENV (lê de window.ENV):**
+```javascript
+window.APP_ENV = {
+    SUPABASE_URL: window.ENV.SUPABASE_URL,
+    SUPABASE_ANON_KEY: window.ENV.SUPABASE_ANON_KEY
+};
+```
+
+**6. supabaseClient.js usa window.APP_ENV:**
 ```javascript
 function getSupabaseConfig() {
     return {
@@ -167,6 +221,13 @@ SUPABASE_ANON_KEY=your_prod_key
 3. **Build command:**
    ```bash
    npm run build
+   ```
+   
+   Isso irá executar `scripts/inject-env.js` que gera o arquivo `env.js` com as variáveis de ambiente do Netlify.
+
+4. **Publish directory:**
+   ```
+   .
    ```
 
 ### Vercel
