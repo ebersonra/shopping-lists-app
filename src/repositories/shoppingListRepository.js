@@ -6,16 +6,40 @@
 
 const { createClient } = require('@supabase/supabase-js');
 
+// Try to load dotenv for local development
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    require('dotenv').config();
+  } catch (e) {
+    // dotenv not available, continue without it
+  }
+}
+
 /**
  * Get Supabase client
  * @returns {Object} - Supabase client instance
  */
 function getClient() {
   const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_API_KEY;
+  
+  // Try multiple environment variable names for backward compatibility
+  // Priority: SUPABASE_SERVICE_API_KEY > SUPABASE_SERVICE_ROLE_KEY > SUPABASE_SERVICE_KEY > SUPABASE_ANON_KEY
+  const supabaseKey = process.env.SUPABASE_SERVICE_API_KEY || 
+                       process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                       process.env.SUPABASE_SERVICE_KEY ||
+                       process.env.SUPABASE_ANON_KEY;
+  
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Supabase credentials are required');
+    const missingVars = [];
+    if (!supabaseUrl) missingVars.push('SUPABASE_URL');
+    if (!supabaseKey) missingVars.push('SUPABASE_SERVICE_API_KEY or SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY');
+    
+    throw new Error(
+      `Supabase credentials are required. Missing: ${missingVars.join(', ')}. ` +
+      `Please set these environment variables in your deployment platform (Netlify/Vercel) or .env file for local development.`
+    );
   }
+  
   return createClient(supabaseUrl, supabaseKey);
 }
 
