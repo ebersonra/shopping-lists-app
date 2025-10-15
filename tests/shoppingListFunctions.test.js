@@ -1,10 +1,10 @@
 // tests/integration/shoppingListFunctions.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { buildHandler } = require('../../netlify/functions/create-shopping-list');
-const { buildHandler: getHandler } = require('../../netlify/functions/get-shopping-list');
-const { buildHandler: updateHandler } = require('../../netlify/functions/update-shopping-list-item');
-const { buildHandler: removeHandler } = require('../../netlify/functions/remove-shopping-list-item');
+const { buildHandler } = require('../src/api/create-shopping-list');
+const { buildHandler: getHandler } = require('../src/api/get-shopping-list');
+const { buildHandler: updateHandler } = require('../src/api/update-shopping-list-item');
+const { buildHandler: removeHandler } = require('../src/api/remove-shopping-list-item');
 
 // Mock event generator
 function makeEvent(body, user_id = '00000000-0000-0000-0000-000000000001') {

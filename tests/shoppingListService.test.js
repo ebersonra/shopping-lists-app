@@ -1,7 +1,7 @@
 // tests/unit/shoppingListService.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const shoppingListService = require('../../src/services/shoppingListService');
+const shoppingListService = require('../src/services/shoppingListService');
 
 test('validateShoppingList - should throw if required fields are missing', () => {
   assert.throws(() => shoppingListService.validateShoppingList({}), /Missing field: user_id/);

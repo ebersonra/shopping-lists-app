@@ -83,91 +83,30 @@ async function createShoppingList(listData, items = []) {
  * @returns {Array} - Array of shopping lists
  */
 async function getShoppingLists(user_id, options = {}) {
-  const supabase = getClient();
-  
-  // Validate UUID format
+  // Validate UUID format before attempting database connection
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!user_id || !uuidRegex.test(user_id)) {
     throw new Error(`Invalid UUID format for user_id: ${user_id}`);
   }
   
-  // Query the base shopping_lists table directly with market join
-  // This is more reliable than querying the view for UUID columns after migration
-  let query = supabase
-    .from('shopping_lists')
-    .select(`
-      *,
-      markets (
-        name,
-        address
-      )
-    `)
-    .eq('user_id', user_id)
-    .is('deleted_at', null);
+  const supabase = getClient();
   
-  // Apply filters
-  if (options.is_completed !== undefined) {
-    query = query.eq('is_completed', options.is_completed);
-  }
-  
-  if (options.market_id) {
-    query = query.eq('market_id', options.market_id);
-  }
-  
-  // Apply ordering
-  const orderBy = options.orderBy || 'created_at';
-  const orderDirection = options.orderDirection || 'desc';
-  query = query.order(orderBy, { ascending: orderDirection === 'asc' });
-  
-  // Apply pagination
-  if (options.limit) {
-    query = query.limit(options.limit);
-    if (options.offset) {
-      query = query.range(options.offset, options.offset + options.limit - 1);
-    }
-  }
-  
-  const { data, error } = await query;
+  // Use RPC function for better UUID handling
+  // This avoids the 400 error when querying with UUID columns
+  const { data, error } = await supabase.rpc('get_shopping_lists_by_user', {
+    p_user_id: user_id,
+    p_limit: options.limit || null,
+    p_offset: options.offset || null,
+    p_is_completed: options.is_completed !== undefined ? options.is_completed : null,
+    p_market_id: options.market_id || null,
+    p_order_by: options.orderBy || 'created_at',
+    p_order_direction: options.orderDirection || 'desc'
+  });
   
   if (error) {
-    console.error('Supabase query error:', error);
+    console.error('Supabase RPC error:', error);
     console.error('Query details - user_id:', user_id, 'options:', options);
     throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}${error.hint ? ' (Hint: ' + error.hint + ')' : ''}`);
-  }
-  
-  // Fetch item counts for each list (since we're not using the view anymore)
-  if (data && data.length > 0) {
-    const listIds = data.map(list => list.id);
-    
-    // Get item counts for all lists
-    const { data: itemCounts } = await supabase
-      .from('shopping_list_items')
-      .select('list_id, is_checked')
-      .in('list_id', listIds);
-    
-    // Calculate counts per list
-    const countsMap = {};
-    if (itemCounts) {
-      itemCounts.forEach(item => {
-        if (!countsMap[item.list_id]) {
-          countsMap[item.list_id] = { total: 0, checked: 0 };
-        }
-        countsMap[item.list_id].total++;
-        if (item.is_checked) {
-          countsMap[item.list_id].checked++;
-        }
-      });
-    }
-    
-    // Add counts and market data to each list
-    return data.map(list => ({
-      ...list,
-      market_name: list.markets?.name || null,
-      market_address: list.markets?.address || null,
-      items_count: countsMap[list.id]?.total || 0,
-      checked_items_count: countsMap[list.id]?.checked || 0,
-      markets: undefined // Remove the nested markets object
-    }));
   }
   
   return data || [];
@@ -180,9 +119,7 @@ async function getShoppingLists(user_id, options = {}) {
  * @returns {Object|null} - Shopping list with items or null if not found
  */
 async function getShoppingListById(id, user_id) {
-  const supabase = getClient();
-  
-  // Validate UUID formats
+  // Validate UUID formats before attempting database connection
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
     throw new Error(`Invalid UUID format for id: ${id}`);
@@ -190,6 +127,8 @@ async function getShoppingListById(id, user_id) {
   if (!user_id || !uuidRegex.test(user_id)) {
     throw new Error(`Invalid UUID format for user_id: ${user_id}`);
   }
+  
+  const supabase = getClient();
   
   // Get the list from base table with market join
   const { data: list, error: listError } = await supabase
@@ -263,9 +202,7 @@ async function getShoppingListByShareCode(shareCode) {
  * @returns {Object} - Updated shopping list
  */
 async function updateShoppingList(id, user_id, updates) {
-  const supabase = getClient();
-  
-  // Validate UUID formats
+  // Validate UUID formats before attempting database connection
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
     throw new Error(`Invalid UUID format for id: ${id}`);
@@ -273,6 +210,8 @@ async function updateShoppingList(id, user_id, updates) {
   if (!user_id || !uuidRegex.test(user_id)) {
     throw new Error(`Invalid UUID format for user_id: ${user_id}`);
   }
+  
+  const supabase = getClient();
   
   const { data, error } = await supabase
     .from('shopping_lists')
@@ -299,9 +238,7 @@ async function updateShoppingList(id, user_id, updates) {
  * @returns {Object} - Deleted shopping list
  */
 async function deleteShoppingList(id, user_id) {
-  const supabase = getClient();
-  
-  // Validate UUID formats
+  // Validate UUID formats before attempting database connection
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
     throw new Error(`Invalid UUID format for id: ${id}`);
@@ -309,6 +246,8 @@ async function deleteShoppingList(id, user_id) {
   if (!user_id || !uuidRegex.test(user_id)) {
     throw new Error(`Invalid UUID format for user_id: ${user_id}`);
   }
+  
+  const supabase = getClient();
   
   const { data, error } = await supabase
     .from('shopping_lists')

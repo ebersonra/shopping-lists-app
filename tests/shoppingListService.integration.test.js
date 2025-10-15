@@ -1,7 +1,7 @@
 // tests/unit/shoppingListService.integration.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const shoppingListService = require('../../src/services/shoppingListService');
+const shoppingListService = require('../src/services/shoppingListService');
 
 // Mock repository
 const mockRepo = {

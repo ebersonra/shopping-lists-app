@@ -39,9 +39,29 @@ function buildHandler(ctrl = controller) {
       };
     } catch (e) {
       console.error('Error in get-shopping-lists:', e);
+      console.error('Error stack:', e.stack);
+      
+      // Determine appropriate status code based on error type
+      let statusCode = 500; // Default to server error
+      
+      // Client errors (4xx)
+      if (e.message.includes('Invalid UUID format') || 
+          e.message.includes('User ID is required') ||
+          e.message.includes('Limit must be') ||
+          e.message.includes('Offset must be')) {
+        statusCode = 400;
+      } else if (e.message.includes('not found') || e.message.includes('Not found')) {
+        statusCode = 404;
+      } else if (e.message.includes('Unauthorized') || e.message.includes('not authorized')) {
+        statusCode = 403;
+      }
+      
       return { 
-        statusCode: 400, 
-        body: JSON.stringify({ error: e.message }) 
+        statusCode, 
+        body: JSON.stringify({ 
+          error: e.message,
+          details: process.env.NODE_ENV !== 'production' ? e.stack : undefined
+        }) 
       };
     }
   };
