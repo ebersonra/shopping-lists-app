@@ -130,6 +130,17 @@ async function getShoppingLists(user_id, options = {}) {
   if (error) {
     console.error('Supabase RPC error:', error);
     console.error('Query details - user_id:', user_id, 'options:', options);
+    
+    // Check if it's a "function not found" error and provide helpful message
+    if (error.message && error.message.includes('Could not find the function')) {
+      throw new Error(
+        `Database error: The RPC function 'get_shopping_lists_by_user' is not installed in your Supabase database. ` +
+        `Please run the SQL script from 'database/get_shopping_lists_by_user_rpc.sql' in your Supabase SQL Editor. ` +
+        `See 'database/SUPABASE_SETUP.md' for detailed instructions. ` +
+        `Original error: ${error.message}`
+      );
+    }
+    
     throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}${error.hint ? ' (Hint: ' + error.hint + ')' : ''}`);
   }
   

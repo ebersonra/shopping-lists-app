@@ -4,6 +4,8 @@
 
 This guide helps you fix the "Supabase credentials are required" error that occurs when Netlify Functions (Lambda) cannot access environment variables.
 
+**Note**: If you're seeing an error about `get_shopping_lists_by_user` function not found, see `docs/TROUBLESHOOTING_RPC_ERROR.md` instead.
+
 ## The Problem
 
 When you deploy to Netlify, the frontend and backend are separate:
@@ -15,6 +17,7 @@ The error occurs when the backend functions don't have the required environment 
 
 ## Error Symptoms
 
+### Environment Variables Error
 ```
 GET /.netlify/functions/get-shopping-lists 500 (Internal Server Error)
 
@@ -23,6 +26,16 @@ GET /.netlify/functions/get-shopping-lists 500 (Internal Server Error)
   "details": "Error: Supabase credentials are required\n    at getClient (/var/task/src/repositories/shoppingListRepository.js:17:11)"
 }
 ```
+
+### Database Function Error
+If you see an error about `get_shopping_lists_by_user` function not found:
+```
+{
+  "error": "Could not find the function public.get_shopping_lists_by_user..."
+}
+```
+
+**This is a different issue!** See `docs/TROUBLESHOOTING_RPC_ERROR.md` for the solution.
 
 ## Solution
 
