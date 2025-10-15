@@ -212,11 +212,31 @@ SUPABASE_ANON_KEY=your_prod_key
    Site settings → Environment variables → Add variable
    ```
 
-2. **Configurar variáveis:**
+2. **Configurar variáveis (Frontend + Backend):**
+   
+   **Para Frontend (páginas HTML):**
    ```
    SUPABASE_URL = https://qtrbojicgwzbnolktwjp.supabase.co
    SUPABASE_ANON_KEY = eyJhbGci...
    ```
+   
+   **Para Backend (Netlify Functions/Lambda):**
+   ```
+   SUPABASE_URL = https://qtrbojicgwzbnolktwjp.supabase.co
+   SUPABASE_SERVICE_API_KEY = eyJhbGci...seu-service-role-key
+   ```
+   
+   ⚠️ **IMPORTANTE:** 
+   - `SUPABASE_ANON_KEY` é a chave pública (segura para frontend)
+   - `SUPABASE_SERVICE_API_KEY` é a chave de serviço (service role key) - apenas backend
+   - Obtenha a service role key em: Supabase Dashboard → Settings → API → Service Role Key
+   - **NUNCA** exponha a service role key no frontend!
+   
+   **Alternativas suportadas para a chave de serviço:**
+   - `SUPABASE_SERVICE_API_KEY` (padrão do projeto)
+   - `SUPABASE_SERVICE_ROLE_KEY` (nome oficial do Supabase)
+   - `SUPABASE_SERVICE_KEY` (alternativa)
+   - `SUPABASE_ANON_KEY` (fallback, mas não recomendado para backend)
 
 3. **Build command:**
    ```bash
@@ -229,6 +249,13 @@ SUPABASE_ANON_KEY=your_prod_key
    ```
    .
    ```
+
+5. **Functions directory:**
+   ```
+   src/api
+   ```
+   
+   As funções Lambda em `src/api/` automaticamente terão acesso às variáveis de ambiente configuradas no Netlify.
 
 ### Vercel
 
@@ -343,6 +370,55 @@ console.log(user);
 1. Verifique se o arquivo está no caminho correto
 2. Abra o console e procure por erros
 3. Verifique se não há erros de sintaxe em `config.js`
+
+### Erro: "Supabase credentials are required" (Backend/Lambda)
+
+**Causa:** As variáveis de ambiente não estão configuradas no Netlify/Vercel para as funções serverless
+
+**Sintomas:**
+```
+GET /.netlify/functions/get-shopping-lists 500 (Internal Server Error)
+Error: Supabase credentials are required
+    at getClient (/var/task/src/repositories/shoppingListRepository.js:17:11)
+```
+
+**Solução:**
+
+1. **Acesse as configurações do Netlify:**
+   ```
+   Site settings → Environment variables
+   ```
+
+2. **Adicione as variáveis necessárias:**
+   ```
+   SUPABASE_URL = https://seu-projeto.supabase.co
+   SUPABASE_SERVICE_API_KEY = sua-service-role-key-aqui
+   ```
+
+3. **Obtenha a Service Role Key:**
+   - Acesse: https://app.supabase.com/project/SEU_PROJETO/settings/api
+   - Copie a chave "service_role" (não a "anon"!)
+   - ⚠️ **CUIDADO:** Esta chave tem acesso total ao banco. Nunca exponha no frontend!
+
+4. **Re-deploy o site:**
+   ```bash
+   netlify deploy --prod
+   ```
+   ou faça um novo commit no GitHub (se auto-deploy está habilitado)
+
+5. **Verifique se as variáveis foram aplicadas:**
+   - Vá em: Deploys → (último deploy) → Deploy log
+   - Procure por: "Environment variables loaded"
+
+**Verificação local com Netlify Dev:**
+```bash
+# Criar .env na raiz do projeto
+echo "SUPABASE_URL=https://seu-projeto.supabase.co" >> .env
+echo "SUPABASE_SERVICE_API_KEY=sua-service-role-key" >> .env
+
+# Rodar localmente
+netlify dev
+```
 
 ### Erro: "Invalid API key"
 
