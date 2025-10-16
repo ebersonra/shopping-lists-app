@@ -6,16 +6,40 @@
 
 const { createClient } = require('@supabase/supabase-js');
 
+// Try to load dotenv for local development
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    require('dotenv').config();
+  } catch (e) {
+    // dotenv not available, continue without it
+  }
+}
+
 /**
  * Get Supabase client
  * @returns {Object} - Supabase client instance
  */
 function getClient() {
   const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_API_KEY;
+  
+  // Try multiple environment variable names for backward compatibility
+  // Priority: SUPABASE_SERVICE_API_KEY > SUPABASE_SERVICE_ROLE_KEY > SUPABASE_SERVICE_KEY > SUPABASE_ANON_KEY
+  const supabaseKey = process.env.SUPABASE_SERVICE_API_KEY || 
+                       process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                       process.env.SUPABASE_SERVICE_KEY ||
+                       process.env.SUPABASE_ANON_KEY;
+  
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Supabase credentials are required');
+    const missingVars = [];
+    if (!supabaseUrl) missingVars.push('SUPABASE_URL');
+    if (!supabaseKey) missingVars.push('SUPABASE_SERVICE_API_KEY or SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY');
+    
+    throw new Error(
+      `Supabase credentials are required. Missing: ${missingVars.join(', ')}. ` +
+      `Please set these environment variables in your deployment platform (Netlify/Vercel) or .env file for local development.`
+    );
   }
+  
   return createClient(supabaseUrl, supabaseKey);
 }
 
@@ -28,45 +52,46 @@ function getClient() {
 async function createShoppingList(listData, items = []) {
   const supabase = getClient();
   
-  // Create the shopping list using stored procedure
-  const { data: list, error: listError } = await supabase.rpc('create_shopping_list', {
-    p_user_id: listData.user_id,
-    p_title: listData.title,
-    p_description: listData.description || null,
-    p_shopping_date: listData.shopping_date,
-    p_market_id: listData.market_id || null
-  });
+  // Create the shopping list using direct insert
+  const { data: list, error: listError } = await supabase
+    .from('shopping_lists')
+    .insert({
+      user_id: listData.user_id,
+      title: listData.title,
+      description: listData.description || null,
+      shopping_date: listData.shopping_date,
+      market_id: listData.market_id || null
+    })
+    .select()
+    .single();
   
   if (listError) throw new Error(listError.message);
   
   // Add items if provided
   if (items.length > 0) {
-    const itemPromises = items.map(item => 
-      supabase.rpc('add_shopping_list_item', {
-        p_list_id: list.id,
-        p_product_name: item.product_name,
-        p_category: item.category,
-        p_quantity: item.quantity,
-        p_unit: item.unit,
-        p_unit_price: item.unit_price,
-        p_notes: item.notes || null
-      })
-    );
+    const itemsToInsert = items.map(item => ({
+      list_id: list.id,
+      product_name: item.product_name,
+      category: item.category,
+      quantity: item.quantity,
+      unit: item.unit,
+      unit_price: item.unit_price || 0,
+      total_price: (item.quantity || 0) * (item.unit_price || 0),
+      notes: item.notes || null
+    }));
     
-    const itemResults = await Promise.all(itemPromises);
+    const { data: createdItems, error: itemsError } = await supabase
+      .from('shopping_list_items')
+      .insert(itemsToInsert)
+      .select();
     
-    // Check for errors in item creation
-    const itemErrors = itemResults.filter(result => result.error);
-    if (itemErrors.length > 0) {
-      throw new Error(`Failed to create items: ${itemErrors.map(e => e.error.message).join(', ')}`);
+    if (itemsError) {
+      throw new Error(`Failed to create items: ${itemsError.message}`);
     }
-    
-    // Extract item data
-    const createdItems = itemResults.map(result => result.data);
     
     return {
       ...list,
-      items: createdItems
+      items: createdItems || []
     };
   }
   
@@ -91,25 +116,75 @@ async function getShoppingLists(user_id, options = {}) {
   
   const supabase = getClient();
   
-  // Use RPC function for better UUID handling
-  // This avoids the 400 error when querying with UUID columns
-  const { data, error } = await supabase.rpc('get_shopping_lists_by_user', {
-    p_user_id: user_id,
-    p_limit: options.limit || null,
-    p_offset: options.offset || null,
-    p_is_completed: options.is_completed !== undefined ? options.is_completed : null,
-    p_market_id: options.market_id || null,
-    p_order_by: options.orderBy || 'created_at',
-    p_order_direction: options.orderDirection || 'desc'
-  });
+  // Build query using Supabase API
+  let query = supabase
+    .from('shopping_lists')
+    .select(`
+      *,
+      markets (
+        name,
+        address
+      )
+    `)
+    .eq('user_id', user_id)
+    .is('deleted_at', null);
+  
+  // Apply filters
+  if (options.is_completed !== undefined) {
+    query = query.eq('is_completed', options.is_completed);
+  }
+  
+  if (options.market_id) {
+    query = query.eq('market_id', options.market_id);
+  }
+  
+  // Apply ordering
+  const orderBy = options.orderBy || 'created_at';
+  const orderDirection = options.orderDirection || 'desc';
+  query = query.order(orderBy, { ascending: orderDirection === 'asc' });
+  
+  // Apply pagination
+  if (options.limit) {
+    query = query.limit(options.limit);
+  }
+  if (options.offset) {
+    query = query.range(options.offset, options.offset + (options.limit || 50) - 1);
+  }
+  
+  const { data, error } = await query;
   
   if (error) {
-    console.error('Supabase RPC error:', error);
+    console.error('Supabase query error:', error);
     console.error('Query details - user_id:', user_id, 'options:', options);
     throw new Error(`Database error: ${error.message}${error.details ? ' - ' + error.details : ''}${error.hint ? ' (Hint: ' + error.hint + ')' : ''}`);
   }
   
-  return data || [];
+  // Count items for each list
+  const listsWithCounts = await Promise.all(
+    (data || []).map(async (list) => {
+      const { count: itemsCount } = await supabase
+        .from('shopping_list_items')
+        .select('*', { count: 'exact', head: true })
+        .eq('list_id', list.id);
+      
+      const { count: checkedCount } = await supabase
+        .from('shopping_list_items')
+        .select('*', { count: 'exact', head: true })
+        .eq('list_id', list.id)
+        .eq('is_checked', true);
+      
+      return {
+        ...list,
+        market_name: list.markets?.name || null,
+        market_address: list.markets?.address || null,
+        markets: undefined,
+        items_count: itemsCount || 0,
+        checked_items_count: checkedCount || 0
+      };
+    })
+  );
+  
+  return listsWithCounts;
 }
 
 /**
@@ -179,18 +254,44 @@ async function getShoppingListById(id, user_id) {
 async function getShoppingListByShareCode(shareCode) {
   const supabase = getClient();
   
-  const { data, error } = await supabase.rpc('get_shopping_list_by_code', {
-    p_share_code: shareCode
-  });
+  // Get list by share code
+  const { data: list, error: listError } = await supabase
+    .from('shopping_lists')
+    .select(`
+      *,
+      markets (
+        name,
+        address
+      )
+    `)
+    .eq('share_code', shareCode)
+    .is('deleted_at', null)
+    .single();
   
-  if (error) throw new Error(error.message);
+  if (listError) {
+    if (listError.code === 'PGRST116') return null; // Not found
+    throw new Error(listError.message);
+  }
   
-  if (!data || data.length === 0) return null;
+  if (!list) return null;
   
-  const result = data[0];
+  // Get items for the list
+  const { data: items, error: itemsError } = await supabase
+    .from('shopping_list_items')
+    .select('*')
+    .eq('list_id', list.id)
+    .order('created_at', { ascending: true });
+  
+  if (itemsError) {
+    throw new Error(`Failed to fetch items: ${itemsError.message}`);
+  }
+  
   return {
-    ...result.list_data,
-    items: result.items_data || []
+    ...list,
+    market_name: list.markets?.name || null,
+    market_address: list.markets?.address || null,
+    markets: undefined,
+    items: items || []
   };
 }
 
@@ -275,15 +376,22 @@ async function deleteShoppingList(id, user_id) {
 async function addItemToList(listId, itemData) {
   const supabase = getClient();
   
-  const { data, error } = await supabase.rpc('add_shopping_list_item', {
-    p_list_id: listId,
-    p_product_name: itemData.product_name,
-    p_category: itemData.category,
-    p_quantity: itemData.quantity,
-    p_unit: itemData.unit,
-    p_unit_price: itemData.unit_price,
-    p_notes: itemData.notes || null
-  });
+  const itemToInsert = {
+    list_id: listId,
+    product_name: itemData.product_name,
+    category: itemData.category,
+    quantity: itemData.quantity,
+    unit: itemData.unit,
+    unit_price: itemData.unit_price || 0,
+    total_price: (itemData.quantity || 0) * (itemData.unit_price || 0),
+    notes: itemData.notes || null
+  };
+  
+  const { data, error } = await supabase
+    .from('shopping_list_items')
+    .insert(itemToInsert)
+    .select()
+    .single();
   
   if (error) throw new Error(error.message);
   return data;

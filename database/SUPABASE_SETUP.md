@@ -22,9 +22,9 @@ Antes de começar, certifique-se de ter:
 3. Cole no editor SQL
 4. Clique em **RUN** (Executar) ou pressione `Ctrl+Enter` (Windows/Linux) ou `Cmd+Enter` (Mac)
 
-### 3️⃣ Verificar a Execução
+### 3️⃣ Verificar a Execução do Script de Inicialização
 
-Após executar o script, você deverá ver no output:
+Após executar o script `init.sql`, você deverá ver no output:
 
 ```
 ========================================
