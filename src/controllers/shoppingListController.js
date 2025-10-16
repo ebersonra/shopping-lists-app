@@ -5,8 +5,7 @@
  */
 
 const service = require('../services/shoppingListService');
-// TODO: Create models folder and define ShoppingList and ShoppingListItem models
-// const { ShoppingList, ShoppingListItem } = require('../models');
+const { ShoppingList, ShoppingListItem } = require('../models/ShoppingList');
 
 /**
  * Create a new shopping list with items
