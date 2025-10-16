@@ -22,53 +22,7 @@ Antes de começar, certifique-se de ter:
 3. Cole no editor SQL
 4. Clique em **RUN** (Executar) ou pressione `Ctrl+Enter` (Windows/Linux) ou `Cmd+Enter` (Mac)
 
-### 3️⃣ Executar o Script de RPC (OBRIGATÓRIO)
-
-⚠️ **IMPORTANTE:** Este passo é obrigatório para que a aplicação funcione corretamente!
-
-A aplicação utiliza uma função RPC (Remote Procedure Call) para buscar listas de compras. Sem esta função, você verá o erro:
-```
-ERROR: Could not find the function public.get_shopping_lists_by_user
-```
-
-**Como executar:**
-
-1. No SQL Editor, clique em **New Query** (Nova consulta)
-2. Copie todo o conteúdo do arquivo `database/get_shopping_lists_by_user_rpc.sql`
-3. Cole no editor SQL
-4. Clique em **RUN** (Executar)
-5. Você deve ver a mensagem: "Success. No rows returned"
-
-**Verificar se a função foi criada:**
-```sql
-SELECT routine_name, routine_type 
-FROM information_schema.routines 
-WHERE routine_name = 'get_shopping_lists_by_user';
-```
-
-Deve retornar:
-```
-routine_name                 | routine_type
-get_shopping_lists_by_user  | FUNCTION
-```
-
-**Testar a função:**
-```sql
--- Use o ID de um usuário criado no passo anterior
-SELECT * FROM get_shopping_lists_by_user(
-    '550e8400-e29b-41d4-a716-446655440001',  -- ID do usuário Ana Silva
-    50,   -- limite
-    0,    -- offset
-    NULL, -- is_completed (NULL = todas)
-    NULL, -- market_id (NULL = todos)
-    'created_at', -- ordenar por
-    'desc' -- direção
-);
-```
-
-📖 Para mais detalhes sobre esta função RPC, consulte: `database/README_RPC.md`
-
-### 4️⃣ Verificar a Execução do Script de Inicialização
+### 3️⃣ Verificar a Execução do Script de Inicialização
 
 Após executar o script `init.sql`, você deverá ver no output:
 
@@ -88,7 +42,7 @@ Sample data created:
 ========================================
 ```
 
-### 5️⃣ Verificar as Tabelas Criadas
+### 4️⃣ Verificar as Tabelas Criadas
 
 Execute as seguintes queries para confirmar:
 
@@ -106,7 +60,7 @@ AND table_type = 'BASE TABLE';
 -- shopping_list_items
 ```
 
-### 6️⃣ Testar as Funções
+### 5️⃣ Testar as Funções
 
 ```sql
 -- Testar busca de usuário por telefone

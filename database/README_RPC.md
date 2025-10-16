@@ -1,6 +1,12 @@
 # Database Migration - RPC Function for Getting Shopping Lists
 
-## Purpose
+## ⚠️ DEPRECATED
+
+**This RPC function is no longer used in the application.**
+
+The application now uses direct Supabase API queries instead of RPC functions for better compatibility and simpler setup. This documentation is kept for reference only.
+
+## Previous Purpose
 This RPC function fixes the 400 Bad Request error when loading shopping lists after the UUID migration.
 
 ## Problem
