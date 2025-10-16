@@ -5,7 +5,9 @@
 
 // Load env vars only in development
 if (process.env.NODE_ENV !== 'production') {
-  try { require('dotenv').config(); } catch (e) {}
+  try {
+    require('dotenv').config();
+  } catch (e) {}
 }
 
 const repository = require('../repositories/shoppingListRepository');
@@ -16,12 +18,12 @@ const repository = require('../repositories/shoppingListRepository');
  * @returns {Function} - Handler function
  */
 function buildHandler(repo = repository) {
-  return async function(event) {
+  return async function (event) {
     // Only allow DELETE requests
     if (event.httpMethod !== 'DELETE') {
       return {
         statusCode: 405,
-        body: JSON.stringify({ error: 'Method not allowed' })
+        body: JSON.stringify({ error: 'Method not allowed' }),
       };
     }
 
@@ -31,7 +33,7 @@ function buildHandler(repo = repository) {
       if (!itemId) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Missing item ID parameter' })
+          body: JSON.stringify({ error: 'Missing item ID parameter' }),
         };
       }
 
@@ -44,19 +46,18 @@ function buildHandler(repo = repository) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': 'Content-Type',
-          'Access-Control-Allow-Methods': 'DELETE, OPTIONS'
+          'Access-Control-Allow-Methods': 'DELETE, OPTIONS',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           message: 'Item removed successfully',
-          item: deletedItem 
-        })
+          item: deletedItem,
+        }),
       };
-
     } catch (error) {
       console.error('Error removing item from shopping list:', error);
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: error.message || 'Internal server error' })
+        body: JSON.stringify({ error: error.message || 'Internal server error' }),
       };
     }
   };

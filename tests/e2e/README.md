@@ -26,7 +26,9 @@ npm run test:e2e:ui
 ## Test Files
 
 ### `navigation.spec.js`
+
 Tests all navigation flows in the application:
+
 - Welcome page to Shopping Lists (form submission)
 - Welcome page to Shopping Lists (skip button)
 - Page persistence with valid user data
@@ -68,6 +70,7 @@ test.describe('My Feature', () => {
 Test configuration is in `playwright.config.js` at the root level.
 
 Key settings:
+
 - **Base URL**: `http://localhost:3000`
 - **Test Directory**: `./tests/e2e`
 - **Reporter**: HTML (generates visual report)
@@ -82,6 +85,7 @@ npm run test:e2e:ui
 ```
 
 This opens an interactive UI where you can:
+
 - Step through tests
 - See page screenshots at each step
 - Replay failed tests
@@ -90,6 +94,7 @@ This opens an interactive UI where you can:
 ## CI/CD
 
 Tests are configured to run in CI with:
+
 - 2 retries on failure
 - Single worker to avoid race conditions
 - Traces captured on first retry for debugging

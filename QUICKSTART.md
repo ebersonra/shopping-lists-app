@@ -56,6 +56,7 @@ npm start
 ### No Console do Navegador (F12):
 
 Você deve ver:
+
 ```
 🚀 Initializing Supabase...
 ✅ Supabase client initialized
@@ -82,26 +83,26 @@ Você deve ver:
 ```html
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Seu conteúdo -->
-    
+
     <!-- Utilitários -->
     <script src="../utils/supabaseClient.js"></script>
     <script>
-        // Inicializar
-        SupabaseUtils.initSupabase();
-        
-        // Usar funções
-        async function loadUser() {
-            const user = await SupabaseUtils.getUserByPhone('11987654321');
-            console.log(user);
-        }
+      // Inicializar
+      SupabaseUtils.initSupabase();
+
+      // Usar funções
+      async function loadUser() {
+        const user = await SupabaseUtils.getUserByPhone('11987654321');
+        console.log(user);
+      }
     </script>
-</body>
+  </body>
 </html>
 ```
 
@@ -116,19 +117,19 @@ const user = await SupabaseUtils.getUserById(userId);
 
 // Criar usuário
 const user = await SupabaseUtils.createUser({
-    name: 'João Silva',
-    phone: '11987654321'
+  name: 'João Silva',
+  phone: '11987654321',
 });
 
 // Buscar ou criar
 const user = await SupabaseUtils.getOrCreateUser({
-    name: 'João Silva',
-    phone: '11987654321'
+  name: 'João Silva',
+  phone: '11987654321',
 });
 
 // Atualizar
 const updated = await SupabaseUtils.updateUser(userId, {
-    name: 'Novo Nome'
+  name: 'Novo Nome',
 });
 
 // Estatísticas
@@ -152,18 +153,23 @@ const stats = await SupabaseUtils.getUserStatistics(userId);
 ## 🆘 Problemas Comuns
 
 ### ❌ "Supabase is not defined"
+
 **Solução:** Adicione o CDN no HTML:
+
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 ```
 
 ### ❌ "relation 'users' does not exist"
+
 **Solução:** Execute `database/init.sql` no Supabase
 
 ### ❌ "permission denied"
+
 **Solução:** Configure as policies RLS (passo 2)
 
 ### ❌ "Failed to create user"
+
 **Solução:** Verifique o console do navegador para o erro específico
 
 ---
@@ -182,6 +188,7 @@ const stats = await SupabaseUtils.getUserStatistics(userId);
 Sua aplicação agora está integrada com Supabase e gerenciando usuários de forma profissional!
 
 **Próximos passos sugeridos:**
+
 1. Atualizar `shopping-lists.html` para usar user_id
 2. Adicionar página de perfil do usuário
 3. Implementar autenticação real (opcional)

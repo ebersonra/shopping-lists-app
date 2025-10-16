@@ -11,7 +11,7 @@ function makeEvent(body, user_id = '00000000-0000-0000-0000-000000000001') {
   return {
     httpMethod: 'POST',
     headers: { cookie: `user_id=${user_id}` },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   };
 }
 
@@ -21,9 +21,7 @@ test('should create a shopping list via function', async () => {
     user_id: '00000000-0000-0000-0000-000000000001',
     title: 'Test List',
     shopping_date: '2025-01-01',
-    items: [
-      { product_name: 'Arroz', category: 'Alimentos', quantity: 1, unit: 'kg' }
-    ]
+    items: [{ product_name: 'Arroz', category: 'Alimentos', quantity: 1, unit: 'kg' }],
   });
   const res = await handler(event);
   // Aceita 200 (sucesso) ou 400 (erro de validação)
@@ -32,7 +30,11 @@ test('should create a shopping list via function', async () => {
 
 test('should get a shopping list by id', async () => {
   const handler = getHandler();
-  const event = { httpMethod: 'GET', queryStringParameters: { id: 'test-list-id', user_id: '00000000-0000-0000-0000-000000000001' }, headers: { cookie: 'user_id=00000000-0000-0000-0000-000000000001' } };
+  const event = {
+    httpMethod: 'GET',
+    queryStringParameters: { id: 'test-list-id', user_id: '00000000-0000-0000-0000-000000000001' },
+    headers: { cookie: 'user_id=00000000-0000-0000-0000-000000000001' },
+  };
   const res = await handler(event);
   // Aceita 200 (encontrado), 404 (não encontrado), 400 (parâmetro faltando) ou 500 (erro de sintaxe UUID)
   assert.ok([200, 404, 400, 500].includes(res.statusCode));
@@ -40,7 +42,12 @@ test('should get a shopping list by id', async () => {
 
 test('should update a shopping list item', async () => {
   const handler = updateHandler();
-  const event = makeEvent({ id: 'test-list-id', item_id: 'item1', updates: { quantity: 2 }, user_id: '00000000-0000-0000-0000-000000000001' });
+  const event = makeEvent({
+    id: 'test-list-id',
+    item_id: 'item1',
+    updates: { quantity: 2 },
+    user_id: '00000000-0000-0000-0000-000000000001',
+  });
   const res = await handler(event);
   // Aceita 200 (sucesso), 404 (não encontrado), 400 (erro de parâmetro) ou 405 (método não permitido)
   assert.ok([200, 404, 400, 405].includes(res.statusCode));
@@ -48,7 +55,11 @@ test('should update a shopping list item', async () => {
 
 test('should remove a shopping list item', async () => {
   const handler = removeHandler();
-  const event = makeEvent({ id: 'test-list-id', item_id: 'item1', user_id: '00000000-0000-0000-0000-000000000001' });
+  const event = makeEvent({
+    id: 'test-list-id',
+    item_id: 'item1',
+    user_id: '00000000-0000-0000-0000-000000000001',
+  });
   const res = await handler(event);
   // Aceita 200 (sucesso), 404 (não encontrado), 400 (erro de parâmetro) ou 405 (método não permitido)
   assert.ok([200, 404, 400, 405].includes(res.statusCode));

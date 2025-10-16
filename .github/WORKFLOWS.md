@@ -9,16 +9,19 @@ Este documento descreve os workflows do GitHub Actions configurados para o Shopp
 **Objetivo:** Validar o código através de build e testes em cada pull request e push.
 
 **Quando executa:**
+
 - Em pull requests para as branches `main` e `develop`
 - Em pushes para as branches `main` e `develop`
 
 **O que faz:**
+
 - ✅ Executa build do projeto
 - ✅ Verifica formatação do código com Prettier
 - ✅ Executa testes automatizados
 - ✅ Testa em múltiplas versões do Node.js (18.x e 20.x)
 
 **Etapas:**
+
 1. Faz checkout do código
 2. Configura Node.js (versões 18.x e 20.x)
 3. Instala dependências com `npm ci`
@@ -31,16 +34,19 @@ Este documento descreve os workflows do GitHub Actions configurados para o Shopp
 **Objetivo:** Fazer deploy automático da aplicação para o Netlify.
 
 **Quando executa:**
+
 - Automaticamente em pushes para a branch `main`
 - Manualmente através do botão "Run workflow" no GitHub Actions
 
 **O que faz:**
+
 - 🚀 Faz build do projeto
 - 🌐 Deploy para produção no Netlify
 - 💬 Adiciona comentários no commit e PRs com URL do deploy
 - ⚡ Deploy das Netlify Functions (src/api)
 
 **Etapas:**
+
 1. Faz checkout do código
 2. Configura Node.js 18.x
 3. Instala dependências com `npm ci`
@@ -52,12 +58,14 @@ Este documento descreve os workflows do GitHub Actions configurados para o Shopp
 Para que o workflow de deploy funcione corretamente, você precisa configurar os seguintes secrets no GitHub:
 
 ### Como adicionar secrets:
+
 1. Acesse o repositório no GitHub
 2. Vá em **Settings** → **Secrets and variables** → **Actions**
 3. Clique em **New repository secret**
 4. Adicione os seguintes secrets:
 
 #### `NETLIFY_AUTH_TOKEN`
+
 - **O que é:** Token de autenticação do Netlify
 - **Como obter:**
   1. Acesse https://app.netlify.com
@@ -66,6 +74,7 @@ Para que o workflow de deploy funcione corretamente, você precisa configurar os
   4. Dê um nome (ex: "GitHub Actions") e copie o token gerado
 
 #### `NETLIFY_SITE_ID`
+
 - **O que é:** ID único do seu site no Netlify
 - **Como obter:**
   1. Acesse https://app.netlify.com
@@ -126,7 +135,7 @@ Edite o arquivo `.github/workflows/ci.yml`:
 ```yaml
 strategy:
   matrix:
-    node-version: [18.x, 20.x, 21.x]  # Adicione ou remova versões
+    node-version: [18.x, 20.x, 21.x] # Adicione ou remova versões
 ```
 
 ### Adicionar mais branches para deploy
@@ -136,7 +145,7 @@ Edite o arquivo `.github/workflows/deploy.yml`:
 ```yaml
 on:
   push:
-    branches: [main, staging]  # Adicione mais branches
+    branches: [main, staging] # Adicione mais branches
 ```
 
 ### Configurar deploy para diferentes ambientes

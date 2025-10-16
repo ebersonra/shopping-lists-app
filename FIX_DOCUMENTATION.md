@@ -1,13 +1,16 @@
 # Fix - Error loading shopping lists (UUID type mismatch)
 
 ## Issue Summary
+
 Users were experiencing a "400 Bad Request" error when trying to load shopping lists:
+
 ```
 GET https://supermarket-lists.netlify.app/.netlify/functions/get-shopping-lists?user_id=608bdcef-56f8-44cd-8991-bb5e1a6dfac4&limit=50 400 (Bad Request)
 Error loading shopping lists: Error: Erro ao carregar listas de compras
 ```
 
 ## Root Cause
+
 The database migration (`convert_shopping_lists_user_id_to_uuid.sql`) converted the `user_id` column from TEXT to UUID type. However, PostgREST/Supabase views (`active_shopping_lists`) may cache schema definitions, causing UUID casting failures when querying with string UUID values.
 
 When the repository code queries the view with `.eq('user_id', string_value)`, PostgREST fails to automatically cast the string to UUID, resulting in a 400 Bad Request error.
@@ -15,19 +18,22 @@ When the repository code queries the view with `.eq('user_id', string_value)`, P
 ## Solution Implemented
 
 ### 1. Use RPC Function Instead of Direct Queries
+
 Changed from querying the `shopping_lists` table directly to using an RPC (Remote Procedure Call) function:
 
 ```javascript
 // Before (direct table query)
 let query = supabase
   .from('shopping_lists')
-  .select(`
+  .select(
+    `
     *,
     markets (
       name,
       address
     )
-  `)
+  `
+  )
   .eq('user_id', user_id)
   .is('deleted_at', null);
 
@@ -39,11 +45,12 @@ const { data, error } = await supabase.rpc('get_shopping_lists_by_user', {
   p_is_completed: options.is_completed !== undefined ? options.is_completed : null,
   p_market_id: options.market_id || null,
   p_order_by: options.orderBy || 'created_at',
-  p_order_direction: options.orderDirection || 'desc'
+  p_order_direction: options.orderDirection || 'desc',
 });
 ```
 
 This approach is more reliable because:
+
 - RPC functions handle UUID casting automatically on the PostgreSQL side
 - The function explicitly casts the string parameter to UUID: `WHERE sl.user_id = p_user_id::UUID`
 - Eliminates the 400 Bad Request error caused by PostgREST's UUID casting issues
@@ -51,6 +58,7 @@ This approach is more reliable because:
 - More performant as the aggregations (item counts) are done in a single query
 
 ### 2. UUID Format Validation
+
 Added validation to catch invalid UUID formats early with helpful error messages:
 
 ```javascript
@@ -61,13 +69,16 @@ if (!user_id || !uuidRegex.test(user_id)) {
 ```
 
 Applied validation BEFORE attempting database connection in all repository functions:
+
 - `getShoppingLists()`
 - `getShoppingListById()`
 - `updateShoppingList()`
 - `deleteShoppingList()`
 
 ### 3. Enhanced Error Handling
+
 Improved error responses in API layer to return appropriate HTTP status codes:
+
 - 400 for client errors (invalid UUID, bad parameters)
 - 404 for not found errors
 - 403 for unauthorized access
@@ -77,8 +88,7 @@ Improved error responses in API layer to return appropriate HTTP status codes:
 // Determine appropriate status code based on error type
 let statusCode = 500; // Default to server error
 
-if (e.message.includes('Invalid UUID format') || 
-    e.message.includes('User ID is required')) {
+if (e.message.includes('Invalid UUID format') || e.message.includes('User ID is required')) {
   statusCode = 400;
 } else if (e.message.includes('not found')) {
   statusCode = 404;
@@ -141,23 +151,29 @@ if (e.message.includes('Invalid UUID format') ||
 ## Testing
 
 ### Automated Unit Tests
+
 ```bash
 npm test
 ```
+
 ✅ All 31 unit tests passing
+
 - UUID validation regex (valid and invalid formats)
-- Repository function existence  
+- Repository function existence
 - UUID validation in getShoppingLists, getShoppingListById, updateShoppingList, deleteShoppingList
 - Service layer validation tests
 - Integration tests with mocked repository
 
 ### E2E Tests
+
 ```bash
 npm run test:e2e
 ```
+
 ✅ Created comprehensive E2E test suites (30 tests total):
 
 **Shopping Lists Page Tests** (`tests/e2e/shopping-lists.spec.js`)
+
 - Load shopping lists page without errors
 - Handle API calls with valid UUID user_id parameter
 - Verify no 400 Bad Request errors for valid UUIDs
@@ -169,6 +185,7 @@ npm run test:e2e
 - Work with various valid UUID formats
 
 **Shopping List Detail Tests** (`tests/e2e/shopping-list-detail.spec.js`)
+
 - Handle valid UUID parameters in URL
 - No 400 Bad Request for get-shopping-list API
 - Handle missing list ID parameter
@@ -181,6 +198,7 @@ npm run test:e2e
 - Work with various valid UUID formats
 
 **Create Shopping List Tests** (`tests/e2e/create-shopping-list.spec.js`)
+
 - Load create shopping list page
 - Use valid UUID when creating shopping list
 - No 400 errors when creating list with valid UUID
@@ -191,6 +209,7 @@ npm run test:e2e
 - Work with user having various valid UUID formats
 
 ### Manual Testing Checklist
+
 - [x] Load shopping lists page - displays lists without 400 error
 - [x] Create new shopping list - works with UUID user_id
 - [x] View existing shopping list - loads correctly with UUID validation
@@ -203,18 +222,22 @@ npm run test:e2e
 ## Impact Analysis
 
 ### Functions Affected
+
 All functions in the repository layer that query with `user_id`:
+
 - ✅ `getShoppingLists()` - FIXED
-- ✅ `getShoppingListById()` - FIXED  
+- ✅ `getShoppingListById()` - FIXED
 - ✅ `updateShoppingList()` - FIXED
 - ✅ `deleteShoppingList()` - FIXED
 
 ### API Endpoints Affected
+
 - ✅ `/.netlify/functions/get-shopping-lists` - Uses fixed `getShoppingLists()`
 - ✅ `/.netlify/functions/get-shopping-list` - Uses fixed `getShoppingListById()`
 - ✅ `/.netlify/functions/create-shopping-list` - Uses RPC (already UUID-compatible)
 
 ### Pages Affected
+
 - ✅ `shopping-lists.html` - Calls get-shopping-lists endpoint
 - ✅ `view-shopping-list.html` - Calls get-shopping-list endpoint
 - ✅ `create-shopping-list.html` - No changes needed

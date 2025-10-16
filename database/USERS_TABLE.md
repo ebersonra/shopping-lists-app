@@ -23,18 +23,18 @@ CREATE TABLE users (
 
 ## 📊 Campos Detalhados
 
-| Campo | Tipo | Restrições | Descrição |
-|-------|------|------------|-----------|
-| `id` | UUID | PRIMARY KEY, NOT NULL | Identificador único do usuário |
-| `name` | TEXT | NOT NULL, length > 0 | Nome completo do usuário |
-| `phone` | TEXT | NULL, min 10 dígitos | Telefone/WhatsApp (formato: 11987654321) |
-| `email` | TEXT | NULL, formato email válido | Email do usuário |
-| `preferred_market_id` | UUID | NULL, FK → markets(id) | Mercado preferido do usuário |
-| `skipped_onboarding` | BOOLEAN | DEFAULT FALSE | Se pulou o formulário de boas-vindas |
-| `is_active` | BOOLEAN | DEFAULT TRUE | Status da conta (ativo/inativo) |
-| `created_at` | TIMESTAMP | DEFAULT now() | Data de criação do registro |
-| `updated_at` | TIMESTAMP | DEFAULT now() | Última atualização (auto) |
-| `deleted_at` | TIMESTAMP | NULL | Soft delete (NULL = ativo) |
+| Campo                 | Tipo      | Restrições                 | Descrição                                |
+| --------------------- | --------- | -------------------------- | ---------------------------------------- |
+| `id`                  | UUID      | PRIMARY KEY, NOT NULL      | Identificador único do usuário           |
+| `name`                | TEXT      | NOT NULL, length > 0       | Nome completo do usuário                 |
+| `phone`               | TEXT      | NULL, min 10 dígitos       | Telefone/WhatsApp (formato: 11987654321) |
+| `email`               | TEXT      | NULL, formato email válido | Email do usuário                         |
+| `preferred_market_id` | UUID      | NULL, FK → markets(id)     | Mercado preferido do usuário             |
+| `skipped_onboarding`  | BOOLEAN   | DEFAULT FALSE              | Se pulou o formulário de boas-vindas     |
+| `is_active`           | BOOLEAN   | DEFAULT TRUE               | Status da conta (ativo/inativo)          |
+| `created_at`          | TIMESTAMP | DEFAULT now()              | Data de criação do registro              |
+| `updated_at`          | TIMESTAMP | DEFAULT now()              | Última atualização (auto)                |
+| `deleted_at`          | TIMESTAMP | NULL                       | Soft delete (NULL = ativo)               |
 
 ## 🔗 Relacionamentos
 
@@ -75,15 +75,15 @@ users (1) ──────── (N) shopping_lists
 
 ```sql
 -- Nome não pode ser vazio
-CONSTRAINT users_name_not_empty 
+CONSTRAINT users_name_not_empty
 CHECK (length(trim(name)) > 0)
 
 -- Telefone deve ter pelo menos 10 dígitos (se fornecido)
-CONSTRAINT users_phone_format 
+CONSTRAINT users_phone_format
 CHECK (phone IS NULL OR length(regexp_replace(phone, '\D', '', 'g')) >= 10)
 
 -- Email deve ter formato válido (se fornecido)
-CONSTRAINT users_email_format 
+CONSTRAINT users_email_format
 CHECK (email IS NULL OR email ~* '^[^\s@]+@[^\s@]+\.[^\s@]+$')
 ```
 
@@ -114,6 +114,7 @@ CREATE INDEX idx_users_is_active ON users(is_active) WHERE is_active = TRUE;
 Cria um novo usuário.
 
 **Sintaxe:**
+
 ```sql
 SELECT * FROM create_user(
     p_name TEXT,
@@ -125,6 +126,7 @@ SELECT * FROM create_user(
 ```
 
 **Exemplo:**
+
 ```sql
 -- Usuário completo
 SELECT * FROM create_user(
@@ -146,6 +148,7 @@ SELECT * FROM create_user('João Santos');
 Atualiza informações de um usuário existente (atualização parcial).
 
 **Sintaxe:**
+
 ```sql
 SELECT * FROM update_user(
     p_user_id UUID,
@@ -157,6 +160,7 @@ SELECT * FROM update_user(
 ```
 
 **Exemplo:**
+
 ```sql
 -- Atualizar apenas telefone
 SELECT * FROM update_user(
@@ -176,6 +180,7 @@ SELECT * FROM update_user(
 **Retorna:** Registro atualizado do usuário
 
 **Erros:**
+
 - Levanta exceção se usuário não encontrado
 
 ### 3. get_user_by_id()
@@ -183,16 +188,19 @@ SELECT * FROM update_user(
 Busca usuário pelo ID com informações do mercado preferido.
 
 **Sintaxe:**
+
 ```sql
 SELECT * FROM get_user_by_id(p_user_id UUID);
 ```
 
 **Exemplo:**
+
 ```sql
 SELECT * FROM get_user_by_id('550e8400-e29b-41d4-a716-446655440001'::UUID);
 ```
 
 **Retorna:**
+
 ```
 ┌────────────────────────┬──────────────┬──────────────┬─────────────────┬─────────────────────┬──────────────────────┐
 │ id                     │ name         │ phone        │ email           │ preferred_market_id │ preferred_market_name│
@@ -206,11 +214,13 @@ SELECT * FROM get_user_by_id('550e8400-e29b-41d4-a716-446655440001'::UUID);
 Busca usuário pelo número de telefone.
 
 **Sintaxe:**
+
 ```sql
 SELECT * FROM get_user_by_phone(p_phone TEXT);
 ```
 
 **Exemplo:**
+
 ```sql
 SELECT * FROM get_user_by_phone('11987654321');
 ```
@@ -220,6 +230,7 @@ SELECT * FROM get_user_by_phone('11987654321');
 **Retorna:** Mesmo formato que `get_user_by_id()`
 
 **Observações:**
+
 - Só retorna usuários ativos (`is_active = TRUE`)
 - Não retorna usuários deletados (`deleted_at IS NULL`)
 
@@ -228,17 +239,20 @@ SELECT * FROM get_user_by_phone('11987654321');
 Soft delete de um usuário (não remove do banco).
 
 **Sintaxe:**
+
 ```sql
 SELECT delete_user(p_user_id UUID);
 ```
 
 **Exemplo:**
+
 ```sql
 SELECT delete_user('550e8400-e29b-41d4-a716-446655440003'::UUID);
 -- Retorna: true (sucesso) ou false (não encontrado)
 ```
 
 **Efeitos:**
+
 - Define `deleted_at` para timestamp atual
 - Define `is_active` como `FALSE`
 - Usuário não aparece mais em buscas normais
@@ -249,16 +263,19 @@ SELECT delete_user('550e8400-e29b-41d4-a716-446655440003'::UUID);
 Retorna estatísticas completas de um usuário.
 
 **Sintaxe:**
+
 ```sql
 SELECT * FROM get_user_statistics(p_user_id UUID);
 ```
 
 **Exemplo:**
+
 ```sql
 SELECT * FROM get_user_statistics('550e8400-e29b-41d4-a716-446655440001'::UUID);
 ```
 
 **Retorna:**
+
 ```
 ┌─────────────┬─────────────────┬─────────────┬────────────┬─────────────┬─────────────────┬──────────────────┐
 │ total_lists │ completed_lists │ active_lists│ total_items│ total_spent │ favorite_market │ favorite_category│
@@ -268,6 +285,7 @@ SELECT * FROM get_user_statistics('550e8400-e29b-41d4-a716-446655440001'::UUID);
 ```
 
 **Métricas:**
+
 - `total_lists`: Total de listas criadas
 - `completed_lists`: Listas marcadas como concluídas
 - `active_lists`: Listas não concluídas e não deletadas
@@ -284,6 +302,7 @@ SELECT * FROM get_user_statistics('550e8400-e29b-41d4-a716-446655440001'::UUID);
 **Função:** Atualiza automaticamente `updated_at` para `now()`
 
 **Comportamento:**
+
 ```sql
 -- Qualquer UPDATE na tabela users
 UPDATE users SET name = 'Novo Nome' WHERE id = '...';
@@ -325,36 +344,33 @@ preferred_market_id: NULL
 ### Fluxo de Onboarding (shopping-welcome.html)
 
 **1. Usuário preenche formulário:**
+
 ```javascript
 const userData = {
-    name: 'João Silva',
-    phone: '11987654321',
-    market: 'carrefour', // valor do select
-    skipped: false
+  name: 'João Silva',
+  phone: '11987654321',
+  market: 'carrefour', // valor do select
+  skipped: false,
 };
 ```
 
 **2. Backend deve:**
+
 ```javascript
 // 1. Criar ou buscar usuário por telefone
-const existingUser = await db.query(
-    'SELECT * FROM get_user_by_phone($1)',
-    [userData.phone]
-);
+const existingUser = await db.query('SELECT * FROM get_user_by_phone($1)', [userData.phone]);
 
 if (!existingUser) {
-    // 2. Buscar/criar market_id baseado no nome
-    const market = await findOrCreateMarket(userData.market);
-    
-    // 3. Criar novo usuário
-    const newUser = await db.query(`
+  // 2. Buscar/criar market_id baseado no nome
+  const market = await findOrCreateMarket(userData.market);
+
+  // 3. Criar novo usuário
+  const newUser = await db.query(
+    `
         SELECT * FROM create_user($1, $2, NULL, $3, $4)
-    `, [
-        userData.name,
-        userData.phone,
-        market.id,
-        userData.skipped
-    ]);
+    `,
+    [userData.name, userData.phone, market.id, userData.skipped]
+  );
 }
 
 // 4. Salvar user_id no localStorage
@@ -364,21 +380,25 @@ localStorage.setItem('user_id', user.id);
 ### Queries Comuns no Frontend
 
 **Verificar se usuário existe:**
+
 ```sql
 SELECT * FROM get_user_by_phone('11987654321');
 ```
 
 **Obter perfil completo:**
+
 ```sql
 SELECT * FROM get_user_by_id('550e8400-e29b-41d4-a716-446655440001'::UUID);
 ```
 
 **Dashboard de usuário:**
+
 ```sql
 SELECT * FROM get_user_statistics('550e8400-e29b-41d4-a716-446655440001'::UUID);
 ```
 
 **Listas do usuário:**
+
 ```sql
 SELECT * FROM get_user_shopping_lists(
     '550e8400-e29b-41d4-a716-446655440001'::UUID,
@@ -391,6 +411,7 @@ SELECT * FROM get_user_shopping_lists(
 ## 🔒 Segurança e Privacidade
 
 ### Soft Delete
+
 - Usuários deletados **não são removidos** do banco
 - `deleted_at` é setado com timestamp
 - `is_active` é marcado como `FALSE`
@@ -401,12 +422,15 @@ SELECT * FROM get_user_shopping_lists(
   - Possível recuperação de conta
 
 ### Campos Opcionais
+
 - `phone`, `email`, `preferred_market_id` são NULL por padrão
 - Permite criação rápida de usuários
 - Dados podem ser completados depois
 
 ### SECURITY DEFINER
+
 Todas as funções usam `SECURITY DEFINER`:
+
 - Executam com privilégios do owner da função
 - Frontend não precisa de permissões diretas nas tabelas
 - Camada adicional de segurança
@@ -414,8 +438,9 @@ Todas as funções usam `SECURITY DEFINER`:
 ## 📊 Queries Úteis
 
 ### Buscar usuários mais ativos
+
 ```sql
-SELECT 
+SELECT
     u.id,
     u.name,
     COUNT(DISTINCT sl.id) as total_lists,
@@ -431,6 +456,7 @@ LIMIT 10;
 ```
 
 ### Usuários sem mercado preferido
+
 ```sql
 SELECT id, name, phone, email
 FROM users
@@ -440,6 +466,7 @@ AND is_active = TRUE;
 ```
 
 ### Usuários inativos (há mais de 30 dias)
+
 ```sql
 SELECT id, name, phone, created_at, updated_at
 FROM users
@@ -450,6 +477,7 @@ ORDER BY updated_at ASC;
 ```
 
 ### Novos usuários (últimos 7 dias)
+
 ```sql
 SELECT id, name, phone, email, created_at
 FROM users
@@ -461,6 +489,7 @@ ORDER BY created_at DESC;
 ## 🧪 Testes
 
 ### Criar usuário de teste
+
 ```sql
 SELECT * FROM create_user(
     'Teste User',
@@ -472,6 +501,7 @@ SELECT * FROM create_user(
 ```
 
 ### Atualizar usuário de teste
+
 ```sql
 SELECT * FROM update_user(
     (SELECT id FROM users WHERE phone = '11999999999'),
@@ -480,6 +510,7 @@ SELECT * FROM update_user(
 ```
 
 ### Deletar usuário de teste
+
 ```sql
 SELECT delete_user(
     (SELECT id FROM users WHERE phone = '11999999999')
@@ -487,6 +518,7 @@ SELECT delete_user(
 ```
 
 ### Verificar integridade referencial
+
 ```sql
 -- Verificar se todos os user_id em shopping_lists existem
 SELECT sl.id, sl.user_id
@@ -515,7 +547,7 @@ WHERE u.id IS NULL;
    - Frontend: aplicar máscara na exibição
    - Backend: remover formatação antes de salvar
 
-3. **Email opcional**: 
+3. **Email opcional**:
    - WhatsApp/telefone como método principal
    - Email como secundário/opcional
 

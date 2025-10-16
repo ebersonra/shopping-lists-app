@@ -7,17 +7,21 @@
 The application now uses direct Supabase API queries instead of RPC functions for better compatibility and simpler setup. This documentation is kept for reference only.
 
 ## Previous Purpose
+
 This RPC function fixes the 400 Bad Request error when loading shopping lists after the UUID migration.
 
 ## Problem
+
 After migrating the `user_id` column from TEXT to UUID, direct queries using `.eq('user_id', user_id)` fail because PostgREST/Supabase doesn't automatically cast string UUIDs to the UUID type properly in all cases.
 
 ## Solution
+
 Create an RPC function that explicitly handles UUID casting on the PostgreSQL side.
 
 ## How to Apply
 
 ### For Supabase Projects
+
 1. Go to your Supabase project dashboard
 2. Navigate to SQL Editor
 3. Create a new query
@@ -26,14 +30,17 @@ Create an RPC function that explicitly handles UUID casting on the PostgreSQL si
 6. Verify the function was created successfully
 
 ### Verification
+
 Run this query to verify the function exists:
+
 ```sql
-SELECT routine_name, routine_type 
-FROM information_schema.routines 
+SELECT routine_name, routine_type
+FROM information_schema.routines
 WHERE routine_name = 'get_shopping_lists_by_user';
 ```
 
 ### Test the Function
+
 ```sql
 SELECT * FROM get_shopping_lists_by_user(
     '9eb946b7-7e29-4460-a9cf-81aebac2ea4c',  -- p_user_id
@@ -48,15 +55,15 @@ SELECT * FROM get_shopping_lists_by_user(
 
 ## Function Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| p_user_id | TEXT | Required | User ID (will be cast to UUID) |
-| p_limit | INTEGER | 50 | Maximum number of results |
-| p_offset | INTEGER | 0 | Number of results to skip |
-| p_is_completed | BOOLEAN | NULL | Filter by completion status (NULL = all) |
-| p_market_id | TEXT | NULL | Filter by market ID |
-| p_order_by | TEXT | 'created_at' | Field to order by |
-| p_order_direction | TEXT | 'desc' | Order direction ('asc' or 'desc') |
+| Parameter         | Type    | Default      | Description                              |
+| ----------------- | ------- | ------------ | ---------------------------------------- |
+| p_user_id         | TEXT    | Required     | User ID (will be cast to UUID)           |
+| p_limit           | INTEGER | 50           | Maximum number of results                |
+| p_offset          | INTEGER | 0            | Number of results to skip                |
+| p_is_completed    | BOOLEAN | NULL         | Filter by completion status (NULL = all) |
+| p_market_id       | TEXT    | NULL         | Filter by market ID                      |
+| p_order_by        | TEXT    | 'created_at' | Field to order by                        |
+| p_order_direction | TEXT    | 'desc'       | Order direction ('asc' or 'desc')        |
 
 ## Return Columns
 
@@ -90,30 +97,38 @@ SELECT * FROM get_shopping_lists_by_user(
 The function is created with `SECURITY DEFINER`, which means it runs with the privileges of the function creator. Ensure proper RLS (Row Level Security) policies are in place on the underlying tables.
 
 Permissions are granted to:
+
 - `authenticated` - Logged-in users
 - `anon` - Anonymous users (if your app allows public access)
 
 ## Troubleshooting
 
 ### Function not found
+
 ```
 ERROR: function get_shopping_lists_by_user does not exist
 ```
+
 **Solution**: Run the migration SQL to create the function.
 
 ### Permission denied
+
 ```
 ERROR: permission denied for function get_shopping_lists_by_user
 ```
+
 **Solution**: Grant execute permission:
+
 ```sql
 GRANT EXECUTE ON FUNCTION get_shopping_lists_by_user TO authenticated;
 ```
 
 ### Invalid UUID format
+
 ```
 ERROR: invalid input syntax for type uuid
 ```
+
 **Solution**: Ensure the user_id parameter is a valid UUID format (e.g., '9eb946b7-7e29-4460-a9cf-81aebac2ea4c').
 
 ## Related Files

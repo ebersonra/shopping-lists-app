@@ -16,13 +16,13 @@ class ShoppingList {
     this.created_at = data.created_at || null;
     this.updated_at = data.updated_at || null;
     this.deleted_at = data.deleted_at || null;
-    
+
     // Additional fields from views/joins
     this.market_name = data.market_name || null;
     this.market_address = data.market_address || null;
     this.items_count = data.items_count || 0;
     this.checked_items_count = data.checked_items_count || 0;
-    
+
     // Business logic fields
     this.items = data.items || [];
     this.status = data.status || null;
@@ -73,7 +73,7 @@ class ShoppingList {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -89,7 +89,7 @@ class ShoppingList {
       shopping_date: this.shopping_date,
       market_id: this.market_id || null,
       total_amount: parseFloat(this.total_amount) || 0,
-      is_completed: Boolean(this.is_completed)
+      is_completed: Boolean(this.is_completed),
     };
   }
 
@@ -150,12 +150,12 @@ class ShoppingList {
    */
   getFormattedDate() {
     if (!this.shopping_date) return '';
-    
+
     const date = new Date(this.shopping_date);
     return date.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
     });
   }
 
@@ -255,7 +255,7 @@ class ShoppingListItem {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -273,7 +273,7 @@ class ShoppingListItem {
       unit_price: parseFloat(this.unit_price) || 0,
       total_price: parseFloat(this.total_price) || 0,
       is_checked: Boolean(this.is_checked),
-      notes: this.notes ? this.notes.trim() : null
+      notes: this.notes ? this.notes.trim() : null,
     };
   }
 
@@ -298,13 +298,13 @@ class ShoppingListItem {
    */
   getFormattedQuantity() {
     const units = {
-      'un': 'unidade',
-      'kg': 'kg',
-      'g': 'g',
-      'l': 'litro',
-      'ml': 'ml',
-      'cx': 'caixa',
-      'pct': 'pacote'
+      un: 'unidade',
+      kg: 'kg',
+      g: 'g',
+      l: 'litro',
+      ml: 'ml',
+      cx: 'caixa',
+      pct: 'pacote',
     };
 
     const unitLabel = units[this.unit] || this.unit;

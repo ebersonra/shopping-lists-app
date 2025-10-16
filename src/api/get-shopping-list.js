@@ -5,7 +5,9 @@
 
 // Load env vars only in development
 if (process.env.NODE_ENV !== 'production') {
-  try { require('dotenv').config(); } catch (e) {}
+  try {
+    require('dotenv').config();
+  } catch (e) {}
 }
 
 const controller = require('../controllers/shoppingListController');
@@ -16,12 +18,12 @@ const controller = require('../controllers/shoppingListController');
  * @returns {Function} - Handler function
  */
 function buildHandler(ctrl = controller) {
-  return async function(event) {
+  return async function (event) {
     // Only allow GET requests
     if (event.httpMethod !== 'GET') {
       return {
         statusCode: 405,
-        body: JSON.stringify({ error: 'Method not allowed' })
+        body: JSON.stringify({ error: 'Method not allowed' }),
       };
     }
 
@@ -31,14 +33,14 @@ function buildHandler(ctrl = controller) {
       if (!id) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Missing list ID parameter' })
+          body: JSON.stringify({ error: 'Missing list ID parameter' }),
         };
       }
 
       if (!user_id) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Missing user_id parameter' })
+          body: JSON.stringify({ error: 'Missing user_id parameter' }),
         };
       }
 
@@ -48,7 +50,7 @@ function buildHandler(ctrl = controller) {
       if (!list) {
         return {
           statusCode: 404,
-          body: JSON.stringify({ error: 'Shopping list not found' })
+          body: JSON.stringify({ error: 'Shopping list not found' }),
         };
       }
 
@@ -58,16 +60,15 @@ function buildHandler(ctrl = controller) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': 'Content-Type',
-          'Access-Control-Allow-Methods': 'GET, OPTIONS'
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
         },
-        body: JSON.stringify(list)
+        body: JSON.stringify(list),
       };
-
     } catch (error) {
       console.error('Error getting shopping list:', error);
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: error.message || 'Internal server error' })
+        body: JSON.stringify({ error: error.message || 'Internal server error' }),
       };
     }
   };

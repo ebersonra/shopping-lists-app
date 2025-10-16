@@ -9,6 +9,7 @@
 **Arquivo:** `/Users/ramostech/Documents/_Dev/shopping-lists-app/.env`
 
 **Mudanças:**
+
 - ✅ Reorganizado com seções claras
 - ✅ Adicionadas variáveis padronizadas:
   - `SUPABASE_URL`
@@ -18,6 +19,7 @@
 - ✅ Documentação inline com comentários
 
 **Configuração Supabase:**
+
 ```env
 SUPABASE_URL=https://qtrbojicgwzbnolktwjp.supabase.co
 SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -31,6 +33,7 @@ SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 **Arquivo:** `/Users/ramostech/Documents/_Dev/shopping-lists-app/src/utils/supabaseClient.js`
 
 **Funcionalidades:**
+
 - ✅ Inicialização do cliente Supabase
 - ✅ 6 funções para gerenciamento de usuários:
   1. `getUserByPhone(phone)` - Buscar por telefone
@@ -46,13 +49,14 @@ SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 - ✅ Exportação global via `window.SupabaseUtils`
 
 **Uso:**
+
 ```javascript
 // Buscar ou criar usuário
 const user = await SupabaseUtils.getOrCreateUser({
-    name: 'João Silva',
-    phone: '11987654321',
-    email: 'joao@email.com',
-    skipped_onboarding: false
+  name: 'João Silva',
+  phone: '11987654321',
+  email: 'joao@email.com',
+  skipped_onboarding: false,
 });
 
 // Buscar por telefone
@@ -71,17 +75,21 @@ const stats = await SupabaseUtils.getUserStatistics(userId);
 **Mudanças:**
 
 #### a) Adicionado CDN do Supabase no `<head>`:
+
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 ```
 
 #### b) Importado utilitário Supabase:
+
 ```html
 <script src="../utils/supabaseClient.js"></script>
 ```
 
 #### c) Substituída função `generateUserId()`:
+
 **ANTES:**
+
 ```javascript
 function generateUserId() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, ...);
@@ -89,6 +97,7 @@ function generateUserId() {
 ```
 
 **DEPOIS:**
+
 ```javascript
 // UUID agora vem do banco de dados via Supabase
 const user = await SupabaseUtils.getOrCreateUser({...});
@@ -96,18 +105,20 @@ const user = await SupabaseUtils.getOrCreateUser({...});
 ```
 
 #### d) Nova função `processAndRedirect()` - ASYNC:
+
 ```javascript
 async function processAndRedirect(name, phone, skipped = false) {
-    // 1. Inicializa loading
-    // 2. Busca ou cria usuário no Supabase
-    // 3. Cria/vincula mercado preferido
-    // 4. Atualiza usuário com mercado
-    // 5. Salva no localStorage
-    // 6. Redireciona
+  // 1. Inicializa loading
+  // 2. Busca ou cria usuário no Supabase
+  // 3. Cria/vincula mercado preferido
+  // 4. Atualiza usuário com mercado
+  // 5. Salva no localStorage
+  // 6. Redireciona
 }
 ```
 
 #### e) Melhorias de UX:
+
 - ✅ Estado de loading ("Processando...")
 - ✅ Mensagem de sucesso ("✅ Sucesso! Redirecionando...")
 - ✅ Tratamento de erros com alert
@@ -115,6 +126,7 @@ async function processAndRedirect(name, phone, skipped = false) {
 - ✅ Logs detalhados no console
 
 #### f) Integração completa:
+
 - ✅ Busca usuário por telefone (se existir)
 - ✅ Cria novo usuário (se não existir)
 - ✅ Cria/busca mercado preferido
@@ -128,6 +140,7 @@ async function processAndRedirect(name, phone, skipped = false) {
 **Arquivo:** `/Users/ramostech/Documents/_Dev/shopping-lists-app/src/utils/userExamples.js`
 
 **Conteúdo:**
+
 - ✅ 11 exemplos práticos de uso
 - ✅ Funções prontas para usar:
   1. `handleUserLogin()` - Fluxo de login
@@ -150,6 +163,7 @@ async function processAndRedirect(name, phone, skipped = false) {
 **Arquivo:** `/Users/ramostech/Documents/_Dev/shopping-lists-app/database/SUPABASE_SETUP.md`
 
 **Conteúdo:**
+
 - ✅ Guia passo a passo de setup
 - ✅ Instruções para executar init.sql no Supabase
 - ✅ Configuração de Row Level Security (RLS)
@@ -208,12 +222,14 @@ async function processAndRedirect(name, phone, skipped = false) {
 ## 🗂️ Arquivos Criados/Modificados
 
 ### Criados:
+
 1. ✅ `src/utils/supabaseClient.js` - Cliente Supabase
 2. ✅ `src/utils/userExamples.js` - Exemplos de uso
 3. ✅ `database/SUPABASE_SETUP.md` - Guia de setup
 4. ✅ `database/CHANGES.md` - Este arquivo
 
 ### Modificados:
+
 1. ✅ `.env` - Reorganizado
 2. ✅ `src/pages/shopping-welcome.html` - Integração Supabase
 3. ✅ `database/init.sql` - Já tinha tabela users (criado anteriormente)
@@ -223,6 +239,7 @@ async function processAndRedirect(name, phone, skipped = false) {
 ## 📋 Checklist de Implementação
 
 ### ✅ Concluído:
+
 - [x] Configurar `.env` com credenciais Supabase
 - [x] Criar `supabaseClient.js` com funções CRUD
 - [x] Atualizar `shopping-welcome.html` para usar Supabase
@@ -236,6 +253,7 @@ async function processAndRedirect(name, phone, skipped = false) {
 - [x] Documentar setup do Supabase
 
 ### 🔄 Próximos Passos:
+
 - [ ] Executar `init.sql` no Supabase
 - [ ] Configurar Row Level Security (RLS)
 - [ ] Testar fluxo de onboarding
@@ -249,6 +267,7 @@ async function processAndRedirect(name, phone, skipped = false) {
 ## 🧪 Como Testar
 
 ### 1. Executar init.sql no Supabase:
+
 ```bash
 # Acesse: https://app.supabase.com
 # Vá para: SQL Editor
@@ -256,11 +275,13 @@ async function processAndRedirect(name, phone, skipped = false) {
 ```
 
 ### 2. Iniciar aplicação:
+
 ```bash
 npm start
 ```
 
 ### 3. Testar onboarding:
+
 ```
 1. Acesse: http://localhost:3000/src/pages/shopping-welcome.html
 2. Preencha nome e telefone
@@ -276,6 +297,7 @@ npm start
 ```
 
 ### 4. Verificar banco de dados:
+
 ```sql
 -- No SQL Editor do Supabase
 SELECT * FROM users ORDER BY created_at DESC LIMIT 5;
@@ -287,18 +309,23 @@ SELECT * FROM markets ORDER BY created_at DESC LIMIT 5;
 ## 🐛 Troubleshooting
 
 ### Problema: "Supabase is not defined"
+
 **Solução:** Verifique se o CDN está no `<head>`:
+
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 ```
 
 ### Problema: "Failed to create or retrieve user"
-**Solução:** 
+
+**Solução:**
+
 1. Verifique credenciais no `.env`
 2. Execute `init.sql` no Supabase
 3. Verifique console do navegador para erro específico
 
 ### Problema: "relation 'users' does not exist"
+
 **Solução:** Execute `init.sql` no Supabase
 
 ---
@@ -318,6 +345,7 @@ SELECT * FROM markets ORDER BY created_at DESC LIMIT 5;
 A integração está **100% completa** e pronta para uso!
 
 **Principais conquistas:**
+
 - ✅ Substituído UUID local por UUID do banco
 - ✅ Usuários agora são persistidos no Supabase
 - ✅ Busca inteligente (não duplica usuários)

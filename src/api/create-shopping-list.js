@@ -1,11 +1,13 @@
 if (process.env.NODE_ENV !== 'production') {
-  try { require('dotenv').config(); } catch (e) {}
+  try {
+    require('dotenv').config();
+  } catch (e) {}
 }
 
 const controller = require('../controllers/shoppingListController');
 
 function buildHandler(ctrl = controller) {
-  return async function(event) {
+  return async function (event) {
     if (event.httpMethod !== 'POST') {
       return { statusCode: 405, body: 'Method Not Allowed' };
     }

@@ -9,7 +9,7 @@ const mockService = {
     return {
       id: 'mock-list-id',
       ...listData,
-      items: items
+      items: items,
     };
   },
   getShoppingLists: async (user_id, options) => {
@@ -17,7 +17,7 @@ const mockService = {
   },
   getShoppingListById: async (id, user_id) => {
     return null;
-  }
+  },
 };
 
 test('Controller - createShoppingList should validate using ShoppingList model', async () => {
@@ -34,9 +34,9 @@ test('Controller - createShoppingList should validate using ShoppingList model',
         quantity: 1,
         unit: 'un',
         unit_price: 5,
-        total_price: 5
-      }
-    ]
+        total_price: 5,
+      },
+    ],
   };
 
   const result = await controller.createShoppingList(validData, mockService);
@@ -48,20 +48,19 @@ test('Controller - createShoppingList should reject when user_id is missing', as
   const invalidData = {
     title: 'Test List',
     shopping_date: '2025-10-16',
-    items: []
+    items: [],
   };
 
-  await assert.rejects(
-    async () => await controller.createShoppingList(invalidData, mockService),
-    { message: 'User ID is required' }
-  );
+  await assert.rejects(async () => await controller.createShoppingList(invalidData, mockService), {
+    message: 'User ID is required',
+  });
 });
 
 test('Controller - createShoppingList should reject when title is missing', async () => {
   const invalidData = {
     user_id: '00000000-0000-0000-0000-000000000001',
     shopping_date: '2025-10-16',
-    items: []
+    items: [],
   };
 
   await assert.rejects(
@@ -76,7 +75,7 @@ test('Controller - createShoppingList should reject when shopping_date is missin
   const invalidData = {
     user_id: '00000000-0000-0000-0000-000000000001',
     title: 'Test List',
-    items: []
+    items: [],
   };
 
   await assert.rejects(
@@ -92,13 +91,12 @@ test('Controller - createShoppingList should reject when items is not an array',
     user_id: '00000000-0000-0000-0000-000000000001',
     title: 'Test List',
     shopping_date: '2025-10-16',
-    items: 'not an array'
+    items: 'not an array',
   };
 
-  await assert.rejects(
-    async () => await controller.createShoppingList(invalidData, mockService),
-    { message: 'Items must be an array' }
-  );
+  await assert.rejects(async () => await controller.createShoppingList(invalidData, mockService), {
+    message: 'Items must be an array',
+  });
 });
 
 test('Controller - createShoppingList should validate item fields', async () => {
@@ -111,9 +109,9 @@ test('Controller - createShoppingList should validate item fields', async () => 
         // missing product_name
         category: 'Mercearia',
         quantity: 1,
-        unit: 'un'
-      }
-    ]
+        unit: 'un',
+      },
+    ],
   };
 
   await assert.rejects(
@@ -134,9 +132,9 @@ test('Controller - createShoppingList should validate item category', async () =
         product_name: 'Sal',
         // missing category
         quantity: 1,
-        unit: 'un'
-      }
-    ]
+        unit: 'un',
+      },
+    ],
   };
 
   await assert.rejects(
@@ -157,9 +155,9 @@ test('Controller - createShoppingList should validate item unit', async () => {
         product_name: 'Sal',
         category: 'Mercearia',
         quantity: 1,
-        unit: 'invalid-unit' // invalid unit value
-      }
-    ]
+        unit: 'invalid-unit', // invalid unit value
+      },
+    ],
   };
 
   await assert.rejects(
@@ -182,7 +180,7 @@ test('Controller - createShoppingList should handle multiple items', async () =>
         quantity: 1,
         unit: 'un',
         unit_price: 5,
-        total_price: 5
+        total_price: 5,
       },
       {
         product_name: 'Açúcar',
@@ -190,9 +188,9 @@ test('Controller - createShoppingList should handle multiple items', async () =>
         quantity: 2,
         unit: 'kg',
         unit_price: 10,
-        total_price: 20
-      }
-    ]
+        total_price: 20,
+      },
+    ],
   };
 
   const result = await controller.createShoppingList(validData, mockService);
