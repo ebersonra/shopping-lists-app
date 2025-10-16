@@ -171,6 +171,80 @@ test.describe('Create Shopping List Page', () => {
       expect(pageUrl).toContain('create-shopping-list.html');
     }
   });
+
+  test('should not throw "ShoppingList is not defined" error when creating list', async ({ page }) => {
+    // Track console errors
+    const consoleErrors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      }
+    });
+
+    // Track API responses
+    const apiResponses = [];
+    page.on('response', async response => {
+      if (response.url().includes('create-shopping-list')) {
+        apiResponses.push({
+          status: response.status(),
+          body: await response.text().catch(() => '{}')
+        });
+      }
+    });
+
+    // Navigate to create shopping list page
+    await page.goto('/src/pages/create-shopping-list.html');
+    
+    // Wait for page to load
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+    
+    // Fill form with valid data
+    const titleField = page.locator('input[name="title"], #title, #listTitle').first();
+    const dateField = page.locator('input[type="date"], #date, #shopping_date').first();
+    
+    if (await titleField.count() > 0 && await dateField.count() > 0) {
+      await titleField.fill('Test Shopping List');
+      
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dateString = tomorrow.toISOString().split('T')[0];
+      await dateField.fill(dateString);
+
+      // Try to add an item
+      const addItemButton = page.locator('button:has-text("Adicionar Item")').first();
+      if (await addItemButton.count() > 0) {
+        await addItemButton.click();
+        await page.waitForTimeout(500);
+        
+        // Fill item details if fields are available
+        const productField = page.locator('input[placeholder*="produto"], input[name*="product"]').first();
+        if (await productField.count() > 0) {
+          await productField.fill('Sal');
+        }
+      }
+      
+      // Submit the form
+      const submitButton = page.locator('button[type="submit"]').first();
+      if (await submitButton.count() > 0) {
+        await submitButton.click();
+        
+        // Wait for API response
+        await page.waitForTimeout(3000);
+        
+        // Verify no "ShoppingList is not defined" error in console
+        const shoppingListErrors = consoleErrors.filter(error => 
+          error.includes('ShoppingList is not defined')
+        );
+        expect(shoppingListErrors.length).toBe(0);
+        
+        // Verify no "ShoppingList is not defined" error in API response
+        if (apiResponses.length > 0) {
+          const response = apiResponses[0];
+          expect(response.body).not.toContain('ShoppingList is not defined');
+        }
+      }
+    }
+  });
 });
 
 test.describe('Create Shopping List - Item Management', () => {
