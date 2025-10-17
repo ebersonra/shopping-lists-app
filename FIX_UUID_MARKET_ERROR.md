@@ -11,6 +11,7 @@ Error: invalid input syntax for type uuid: "2"
 ### Error Details
 
 **Console Error:**
+
 ```
 POST /.netlify/functions/create-shopping-list 400 (Bad Request)
 Error saving list: Error: invalid input syntax for type uuid: "2"
@@ -18,6 +19,7 @@ Error saving list: Error: invalid input syntax for type uuid: "2"
 ```
 
 **API Response:**
+
 ```json
 {
   "error": "invalid input syntax for type uuid: \"2\""
@@ -25,6 +27,7 @@ Error saving list: Error: invalid input syntax for type uuid: "2"
 ```
 
 **Request Payload:**
+
 ```json
 {
   "user_id": "9eb946b7-7e29-4460-a9cf-81aebac2ea4c",
@@ -72,6 +75,7 @@ The `market_id` field is **optional** in the database schema (nullable). The sim
 **File: `src/pages/create-shopping-list.html`**
 
 Changed from:
+
 ```javascript
 async function loadMarkets() {
   return [
@@ -85,6 +89,7 @@ async function loadMarkets() {
 ```
 
 To:
+
 ```javascript
 async function loadMarkets() {
   // TODO: Implement API call to fetch markets from the database
@@ -95,6 +100,7 @@ async function loadMarkets() {
 ```
 
 This fix:
+
 1. Removes the fake market data with invalid IDs
 2. Keeps the market dropdown with only the "Selecione um mercado (opcional)" option
 3. Allows `market_id` to be `null` when creating a shopping list
@@ -139,6 +145,7 @@ Added 2 new integration tests in `tests/create-shopping-list-integration.test.js
 ### Test Results
 
 All 58 unit tests pass:
+
 ```
 # tests 58
 # pass 58
@@ -148,6 +155,7 @@ All 58 unit tests pass:
 ### Manual Verification
 
 Tested creating a shopping list without selecting a market:
+
 ```javascript
 ✅ PASSED: List created successfully with market_id: null
 ```

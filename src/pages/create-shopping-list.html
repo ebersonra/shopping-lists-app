@@ -921,10 +921,22 @@
 
       // Load markets from API
       async function loadMarkets() {
-        // TODO: Implement API call to fetch markets from the database
-        // For now, return empty array to avoid UUID validation errors
-        // Users can create shopping lists without selecting a market (market_id is optional)
-        return [];
+        try {
+          const user_id = await getUserId();
+
+          const response = await fetch(`/.netlify/functions/get-markets?user_id=${user_id}`);
+
+          if (!response.ok) {
+            console.error('Failed to load markets:', response.status);
+            return [];
+          }
+
+          const data = await response.json();
+          return data.markets || [];
+        } catch (error) {
+          console.error('Error loading markets:', error);
+          return [];
+        }
       }
 
       // Load markets into select
@@ -936,7 +948,7 @@
           markets.forEach((market) => {
             const option = document.createElement('option');
             option.value = market.id;
-            option.textContent = `${market.nome} - ${market.endereco}`;
+            option.textContent = `${market.name}${market.address ? ' - ' + market.address : ''}`;
             select.appendChild(option);
           });
         } catch (error) {
