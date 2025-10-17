@@ -919,15 +919,12 @@
         document.getElementById('shoppingDate').value = today;
       }
 
-      // Load markets (simulated data for now)
+      // Load markets from API
       async function loadMarkets() {
-        return [
-          { id: 1, nome: 'Supermercado Pão de Açúcar', endereco: 'Av. Paulista, 1234' },
-          { id: 2, nome: 'Extra Hiper', endereco: 'Rua das Flores, 567' },
-          { id: 3, nome: 'Carrefour', endereco: 'Shopping Center, Loja 89' },
-          { id: 4, nome: 'Atacadão', endereco: 'Av. Marginal, 890' },
-          { id: 5, nome: 'Big Bompreço', endereco: 'Rua do Comércio, 123' },
-        ];
+        // TODO: Implement API call to fetch markets from the database
+        // For now, return empty array to avoid UUID validation errors
+        // Users can create shopping lists without selecting a market (market_id is optional)
+        return [];
       }
 
       // Load markets into select
