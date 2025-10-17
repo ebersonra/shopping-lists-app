@@ -58,7 +58,7 @@ class Market {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -102,19 +102,19 @@ class Market {
       phone: this.phone ? this.phone.replace(/\D/g, '') : null,
       email: this.email ? this.email.trim().toLowerCase() : null,
       website: this.website ? this.website.trim() : null,
-      user_id: this.user_id
+      user_id: this.user_id,
     };
   }
 
   /**
    * Create from form data
-   * @param {FormData|Object} formData 
-   * @param {string} user_id 
+   * @param {FormData|Object} formData
+   * @param {string} user_id
    * @returns {Market}
    */
   static fromFormData(formData, user_id) {
     const data = {};
-    
+
     if (formData instanceof FormData) {
       data.name = formData.get('name');
       data.address = formData.get('address');
@@ -132,8 +132,8 @@ class Market {
 
   /**
    * Create from CNPJ API response
-   * @param {Object} apiData 
-   * @param {string} user_id 
+   * @param {Object} apiData
+   * @param {string} user_id
    * @returns {Market}
    */
   static fromCnpjApi(apiData, user_id) {
@@ -143,31 +143,31 @@ class Market {
       cnpj: apiData.cnpj || '',
       phone: apiData.telefone || '',
       email: apiData.email || '',
-      user_id
+      user_id,
     });
   }
 
   /**
    * Format address from CNPJ API data
-   * @param {Object} apiData 
+   * @param {Object} apiData
    * @returns {string}
    */
   static formatAddressFromApi(apiData) {
     const parts = [];
-    
+
     if (apiData.logradouro) parts.push(apiData.logradouro);
     if (apiData.numero) parts.push(apiData.numero);
     if (apiData.bairro) parts.push(apiData.bairro);
     if (apiData.municipio) parts.push(apiData.municipio);
     if (apiData.uf) parts.push(apiData.uf);
     if (apiData.cep) parts.push(`CEP: ${apiData.cep}`);
-    
+
     return parts.join(', ');
   }
 
   /**
    * Get short address for lists
-   * @param {number} maxLength 
+   * @param {number} maxLength
    * @returns {string}
    */
   getShortAddress(maxLength = 50) {
@@ -191,11 +191,11 @@ class Market {
    */
   getContactInfo() {
     const contacts = [];
-    
+
     if (this.phone) contacts.push(`Tel: ${this.getFormattedPhone()}`);
     if (this.email) contacts.push(`Email: ${this.email}`);
     if (this.website) contacts.push(`Site: ${this.website}`);
-    
+
     return contacts.join(' | ');
   }
 

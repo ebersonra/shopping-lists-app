@@ -5,8 +5,7 @@
  */
 
 const service = require('../services/shoppingListService');
-// TODO: Create models folder and define ShoppingList and ShoppingListItem models
-// const { ShoppingList, ShoppingListItem } = require('../models');
+const { ShoppingList, ShoppingListItem } = require('../models/ShoppingList');
 
 /**
  * Create a new shopping list with items
@@ -18,45 +17,45 @@ async function createShoppingList(data, srv = service) {
   if (!data || typeof data !== 'object') {
     throw new Error('Request data is required');
   }
-  
+
   // Extract list data and items from request
   const { title, description, shopping_date, market_id, user_id, items } = data;
-  
+
   if (!user_id) {
     throw new Error('User ID is required');
   }
-  
+
   if (!Array.isArray(items)) {
     throw new Error('Items must be an array');
   }
-  
+
   // Create and validate shopping list model
   const shoppingList = new ShoppingList({
     user_id,
     title,
     description,
     shopping_date,
-    market_id
+    market_id,
   });
-  
+
   const listValidation = shoppingList.validate();
   if (!listValidation.isValid) {
     throw new Error(`List validation failed: ${listValidation.errors.join(', ')}`);
   }
-  
+
   // Validate all items
   const validatedItems = [];
   for (let i = 0; i < items.length; i++) {
     const item = new ShoppingListItem(items[i]);
     const itemValidation = item.validate();
-    
+
     if (!itemValidation.isValid) {
       throw new Error(`Item ${i + 1} validation failed: ${itemValidation.errors.join(', ')}`);
     }
-    
+
     validatedItems.push(item.toDbFormat());
   }
-  
+
   // Delegate to service with validated data
   return srv.createShoppingList(shoppingList.toDbFormat(), validatedItems);
 }
@@ -76,32 +75,32 @@ async function createShoppingList(data, srv = service) {
  */
 async function getShoppingLists(params, srv = service) {
   const { user_id, is_completed, market_id, orderBy, orderDirection } = params || {};
-  
+
   if (!user_id) {
     throw new Error('User ID is required');
   }
-  
+
   // Convert string parameters to numbers with validation
   let limit = parseInt(params.limit) || 50;
   let offset = parseInt(params.offset) || 0;
-  
+
   if (limit < 1 || limit > 100) {
     throw new Error('Limit must be a number between 1 and 100');
   }
-  
+
   if (offset < 0) {
     throw new Error('Offset must be a non-negative number');
   }
-  
+
   const options = {
     is_completed,
     market_id,
     limit,
     offset,
     orderBy,
-    orderDirection
+    orderDirection,
   };
-  
+
   return srv.getShoppingLists(user_id, options);
 }
 
@@ -116,11 +115,11 @@ async function getShoppingListById(id, user_id, srv = service) {
   if (!id) {
     throw new Error('Shopping list ID is required');
   }
-  
+
   if (!user_id) {
     throw new Error('User ID is required');
   }
-  
+
   return srv.getShoppingListById(id, user_id);
 }
 
@@ -134,7 +133,7 @@ async function getShoppingListByShareCode(shareCode, srv = service) {
   if (!shareCode) {
     throw new Error('Share code is required');
   }
-  
+
   return srv.getShoppingListByShareCode(shareCode);
 }
 
@@ -149,19 +148,19 @@ async function getShoppingListByShareCode(shareCode, srv = service) {
  */
 async function updateShoppingList(data, srv = service) {
   const { id, user_id, updates } = data || {};
-  
+
   if (!id) {
     throw new Error('Shopping list ID is required');
   }
-  
+
   if (!user_id) {
     throw new Error('User ID is required');
   }
-  
+
   if (!updates || typeof updates !== 'object') {
     throw new Error('Updates object is required');
   }
-  
+
   return srv.updateShoppingList(id, user_id, updates);
 }
 
@@ -175,15 +174,15 @@ async function updateShoppingList(data, srv = service) {
  */
 async function deleteShoppingList(params, srv = service) {
   const { id, user_id } = params || {};
-  
+
   if (!id) {
     throw new Error('Shopping list ID is required');
   }
-  
+
   if (!user_id) {
     throw new Error('User ID is required');
   }
-  
+
   return srv.deleteShoppingList(id, user_id);
 }
 
@@ -197,19 +196,19 @@ async function deleteShoppingList(params, srv = service) {
  */
 async function completeShoppingList(params, srv = service) {
   const { id, user_id } = params || {};
-  
+
   if (!id) {
     throw new Error('Shopping list ID is required');
   }
-  
+
   if (!user_id) {
     throw new Error('User ID is required');
   }
-  
+
   const updates = {
-    is_completed: true
+    is_completed: true,
   };
-  
+
   return srv.updateShoppingList(id, user_id, updates);
 }
 
@@ -222,47 +221,51 @@ async function completeShoppingList(params, srv = service) {
  */
 async function getShoppingListStats(params, srv = service) {
   const { user_id } = params || {};
-  
+
   if (!user_id) {
     throw new Error('User ID is required');
   }
-  
+
   // Get all lists for the user
   const allLists = await srv.getShoppingLists(user_id, { limit: 1000 });
-  
+
   // Calculate statistics
   const totalLists = allLists.length;
-  const completedLists = allLists.filter(list => list.is_completed).length;
+  const completedLists = allLists.filter((list) => list.is_completed).length;
   const activeLists = totalLists - completedLists;
-  const overdueLists = allLists.filter(list => list.status === 'overdue' && !list.is_completed).length;
-  const todayLists = allLists.filter(list => list.status === 'today' && !list.is_completed).length;
-  
+  const overdueLists = allLists.filter(
+    (list) => list.status === 'overdue' && !list.is_completed
+  ).length;
+  const todayLists = allLists.filter(
+    (list) => list.status === 'today' && !list.is_completed
+  ).length;
+
   const totalValue = allLists.reduce((sum, list) => sum + (list.total_amount || 0), 0);
   const averageValue = totalLists > 0 ? totalValue / totalLists : 0;
-  
+
   const totalItems = allLists.reduce((sum, list) => sum + (list.items_count || 0), 0);
   const averageItemsPerList = totalLists > 0 ? totalItems / totalLists : 0;
-  
+
   return {
     summary: {
       total_lists: totalLists,
       active_lists: activeLists,
       completed_lists: completedLists,
       overdue_lists: overdueLists,
-      today_lists: todayLists
+      today_lists: todayLists,
     },
     financial: {
       total_value: totalValue,
       average_list_value: averageValue,
       completed_value: allLists
-        .filter(list => list.is_completed)
-        .reduce((sum, list) => sum + (list.total_amount || 0), 0)
+        .filter((list) => list.is_completed)
+        .reduce((sum, list) => sum + (list.total_amount || 0), 0),
     },
     items: {
       total_items: totalItems,
-      average_items_per_list: averageItemsPerList
+      average_items_per_list: averageItemsPerList,
     },
-    completion_rate: totalLists > 0 ? (completedLists / totalLists) * 100 : 0
+    completion_rate: totalLists > 0 ? (completedLists / totalLists) * 100 : 0,
   };
 }
 
@@ -274,5 +277,5 @@ module.exports = {
   updateShoppingList,
   deleteShoppingList,
   completeShoppingList,
-  getShoppingListStats
+  getShoppingListStats,
 };

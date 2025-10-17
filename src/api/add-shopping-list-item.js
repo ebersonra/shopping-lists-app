@@ -5,7 +5,9 @@
 
 // Load env vars only in development
 if (process.env.NODE_ENV !== 'production') {
-  try { require('dotenv').config(); } catch (e) {}
+  try {
+    require('dotenv').config();
+  } catch (e) {}
 }
 
 const repository = require('../repositories/shoppingListRepository');
@@ -16,12 +18,12 @@ const repository = require('../repositories/shoppingListRepository');
  * @returns {Function} - Handler function
  */
 function buildHandler(repo = repository) {
-  return async function(event) {
+  return async function (event) {
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
       return {
         statusCode: 405,
-        body: JSON.stringify({ error: 'Method not allowed' })
+        body: JSON.stringify({ error: 'Method not allowed' }),
       };
     }
 
@@ -32,7 +34,7 @@ function buildHandler(repo = repository) {
       if (!listId) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Missing list ID parameter' })
+          body: JSON.stringify({ error: 'Missing list ID parameter' }),
         };
       }
 
@@ -42,7 +44,9 @@ function buildHandler(repo = repository) {
       if (!product_name || !category || !quantity || !unit) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Missing required fields: product_name, category, quantity, unit' })
+          body: JSON.stringify({
+            error: 'Missing required fields: product_name, category, quantity, unit',
+          }),
         };
       }
 
@@ -52,22 +56,22 @@ function buildHandler(repo = repository) {
         category: category.trim(),
         quantity: parseFloat(quantity),
         unit: unit.trim(),
-        unit_price: unit_price ? parseFloat(unit_price) : 0.00,
-        notes: notes ? notes.trim() : null
+        unit_price: unit_price ? parseFloat(unit_price) : 0.0,
+        notes: notes ? notes.trim() : null,
       };
 
       // Validate data
       if (itemData.quantity <= 0) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Quantity must be greater than zero' })
+          body: JSON.stringify({ error: 'Quantity must be greater than zero' }),
         };
       }
 
       if (itemData.unit_price < 0) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Price cannot be negative' })
+          body: JSON.stringify({ error: 'Price cannot be negative' }),
         };
       }
 
@@ -80,16 +84,15 @@ function buildHandler(repo = repository) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': 'Content-Type',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS'
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
         },
-        body: JSON.stringify(newItem)
+        body: JSON.stringify(newItem),
       };
-
     } catch (error) {
       console.error('Error adding item to shopping list:', error);
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: error.message || 'Internal server error' })
+        body: JSON.stringify({ error: error.message || 'Internal server error' }),
       };
     }
   };

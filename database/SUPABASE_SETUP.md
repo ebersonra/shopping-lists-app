@@ -3,6 +3,7 @@
 ## 📋 Pré-requisitos
 
 Antes de começar, certifique-se de ter:
+
 - [ ] Conta no Supabase (https://supabase.com)
 - [ ] Projeto criado no Supabase
 - [ ] Acesso ao SQL Editor do projeto
@@ -48,9 +49,9 @@ Execute as seguintes queries para confirmar:
 
 ```sql
 -- Verificar tabelas
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
 AND table_type = 'BASE TABLE';
 
 -- Deve retornar:
@@ -194,7 +195,7 @@ SELECT id, name, address FROM markets;
 SELECT id, title, share_code, total_amount FROM shopping_lists;
 
 -- Ver itens
-SELECT 
+SELECT
     sl.title as lista,
     sli.product_name,
     sli.category,
@@ -219,11 +220,13 @@ SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ## ✅ Testar a Aplicação
 
 1. **Inicie o servidor de desenvolvimento:**
+
    ```bash
    npm start
    ```
 
 2. **Acesse a página de boas-vindas:**
+
    ```
    http://localhost:3000/src/pages/shopping-welcome.html
    ```
@@ -245,6 +248,7 @@ SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ### Erro: "Supabase client not initialized"
 
 **Solução:** Verifique se o CDN do Supabase está carregando:
+
 ```html
 <!-- Deve estar no <head> do HTML -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -260,7 +264,8 @@ SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### Erro: "Failed to create or retrieve user"
 
-**Solução:** 
+**Solução:**
+
 1. Abra o Console do navegador (F12)
 2. Veja os erros detalhados
 3. Verifique se as credenciais do Supabase estão corretas no `.env`

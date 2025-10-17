@@ -9,11 +9,13 @@ Acesse: https://github.com/ebersonra/shopping-lists-app/settings/secrets/actions
 Adicione dois secrets:
 
 #### NETLIFY_AUTH_TOKEN
+
 1. Vá para https://app.netlify.com
 2. User Settings → Applications → Personal Access Tokens
 3. Crie novo token e copie o valor
 
 #### NETLIFY_SITE_ID
+
 1. Vá para https://app.netlify.com
 2. Selecione seu site
 3. Site Settings → General → Site ID (ou API ID)
@@ -47,11 +49,13 @@ Após configurar os secrets:
 ## 🔧 Troubleshooting
 
 ### Se o CI falhar:
+
 - ✅ Normal! Testes e formatação têm `continue-on-error`
 - ⚠️ Verifique os logs para ver problemas reais
 - 📝 Corrija os testes gradualmente
 
 ### Se o Deploy falhar:
+
 - ❌ Verifique se os secrets estão configurados
 - ❌ Verifique os valores dos secrets
 - ❌ Veja os logs completos na aba Actions

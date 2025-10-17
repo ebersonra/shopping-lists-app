@@ -7,13 +7,41 @@ const shoppingListService = require('../src/services/shoppingListService');
 const mockRepo = {
   createShoppingList: (list, items) => ({ id: 'list1', ...list, items }),
   getShoppingLists: () => [
-    { id: 'list1', user_id: '1', title: 'Test', shopping_date: '2025-01-01', items_count: 2, checked_items_count: 1, total_amount: 10, is_completed: false },
+    {
+      id: 'list1',
+      user_id: '1',
+      title: 'Test',
+      shopping_date: '2025-01-01',
+      items_count: 2,
+      checked_items_count: 1,
+      total_amount: 10,
+      is_completed: false,
+    },
   ],
   getShoppingListById: () => ({
-    id: 'list1', user_id: '1', title: 'Test', shopping_date: '2025-01-01', items: [
-      { product_name: 'Arroz', category: 'Alimentos', quantity: 1, unit: 'kg', is_checked: true, total_price: 5 },
-      { product_name: 'Feijão', category: 'Alimentos', quantity: 1, unit: 'kg', is_checked: false, total_price: 5 },
-    ], is_completed: false
+    id: 'list1',
+    user_id: '1',
+    title: 'Test',
+    shopping_date: '2025-01-01',
+    items: [
+      {
+        product_name: 'Arroz',
+        category: 'Alimentos',
+        quantity: 1,
+        unit: 'kg',
+        is_checked: true,
+        total_price: 5,
+      },
+      {
+        product_name: 'Feijão',
+        category: 'Alimentos',
+        quantity: 1,
+        unit: 'kg',
+        is_checked: false,
+        total_price: 5,
+      },
+    ],
+    is_completed: false,
   }),
   getShoppingListByShareCode: () => null,
   updateShoppingList: (id, user_id, updates) => ({ id, user_id, ...updates }),
@@ -24,7 +52,7 @@ test('should create a shopping list with valid data', async () => {
   const listData = { user_id: '1', title: 'Test', shopping_date: '2025-01-01' };
   const items = [
     { product_name: 'Arroz', category: 'Alimentos', quantity: 1, unit: 'kg' },
-    { product_name: 'Feijão', category: 'Alimentos', quantity: 1, unit: 'kg' }
+    { product_name: 'Feijão', category: 'Alimentos', quantity: 1, unit: 'kg' },
   ];
   const result = await shoppingListService.createShoppingList(listData, items, mockRepo);
   assert.strictEqual(result.id, 'list1');
@@ -45,7 +73,12 @@ test('should get shopping list by id with summary', async () => {
 });
 
 test('should update a shopping list', async () => {
-  const updated = await shoppingListService.updateShoppingList('list1', '1', { title: 'Updated' }, mockRepo);
+  const updated = await shoppingListService.updateShoppingList(
+    'list1',
+    '1',
+    { title: 'Updated' },
+    mockRepo
+  );
   assert.strictEqual(updated.title, 'Updated');
 });
 

@@ -7,7 +7,7 @@ const assert = require('node:assert');
 
 test('UUID validation regex - valid UUIDs', () => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  
+
   // Valid UUIDs with different formats
   assert.ok(uuidRegex.test('608bdcef-56f8-44cd-8991-bb5e1a6dfac4'));
   assert.ok(uuidRegex.test('9eb946b7-7e29-4460-a9cf-81aebac2ea4c'));
@@ -19,7 +19,7 @@ test('UUID validation regex - valid UUIDs', () => {
 
 test('UUID validation regex - invalid UUIDs', () => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  
+
   // Invalid UUIDs
   assert.ok(!uuidRegex.test('not-a-uuid'));
   assert.ok(!uuidRegex.test('608bdcef-56f8-44cd-8991-bb5e1a6dfac')); // Too short
@@ -34,7 +34,7 @@ test('UUID validation regex - invalid UUIDs', () => {
 test('Repository functions exist', async () => {
   // Verify all repository functions are exported
   const repository = require('../src/repositories/shoppingListRepository');
-  
+
   assert.ok(typeof repository.createShoppingList === 'function');
   assert.ok(typeof repository.getShoppingLists === 'function');
   assert.ok(typeof repository.getShoppingListById === 'function');
@@ -48,7 +48,7 @@ test('Repository functions exist', async () => {
 
 test('Repository UUID validation - getShoppingLists should reject invalid UUID', async () => {
   const repository = require('../src/repositories/shoppingListRepository');
-  
+
   // Test with invalid user_id formats
   const invalidUUIDs = [
     '',
@@ -57,9 +57,9 @@ test('Repository UUID validation - getShoppingLists should reject invalid UUID',
     'GGGGGGG-GGGG-GGGG-GGGG-GGGGGGGGGGGG',
     '608bdcef-56f8-44cd-8991', // incomplete
     null,
-    undefined
+    undefined,
   ];
-  
+
   for (const invalidUUID of invalidUUIDs) {
     await assert.rejects(
       async () => repository.getShoppingLists(invalidUUID),
@@ -72,19 +72,19 @@ test('Repository UUID validation - getShoppingLists should reject invalid UUID',
 test('Repository UUID validation - getShoppingListById should reject invalid UUIDs', async () => {
   const repository = require('../src/repositories/shoppingListRepository');
   const validUUID = '608bdcef-56f8-44cd-8991-bb5e1a6dfac4';
-  
+
   // Test with invalid id
   await assert.rejects(
     async () => repository.getShoppingListById('invalid-id', validUUID),
     /Invalid UUID format for id/
   );
-  
+
   // Test with invalid user_id
   await assert.rejects(
     async () => repository.getShoppingListById(validUUID, 'invalid-user'),
     /Invalid UUID format for user_id/
   );
-  
+
   // Test with both invalid
   await assert.rejects(
     async () => repository.getShoppingListById('invalid-id', 'invalid-user'),
@@ -95,13 +95,13 @@ test('Repository UUID validation - getShoppingListById should reject invalid UUI
 test('Repository UUID validation - updateShoppingList should reject invalid UUIDs', async () => {
   const repository = require('../src/repositories/shoppingListRepository');
   const validUUID = '608bdcef-56f8-44cd-8991-bb5e1a6dfac4';
-  
+
   // Test with invalid id
   await assert.rejects(
     async () => repository.updateShoppingList('invalid-id', validUUID, { title: 'New Title' }),
     /Invalid UUID format for id/
   );
-  
+
   // Test with invalid user_id
   await assert.rejects(
     async () => repository.updateShoppingList(validUUID, 'invalid-user', { title: 'New Title' }),
@@ -112,13 +112,13 @@ test('Repository UUID validation - updateShoppingList should reject invalid UUID
 test('Repository UUID validation - deleteShoppingList should reject invalid UUIDs', async () => {
   const repository = require('../src/repositories/shoppingListRepository');
   const validUUID = '608bdcef-56f8-44cd-8991-bb5e1a6dfac4';
-  
+
   // Test with invalid id
   await assert.rejects(
     async () => repository.deleteShoppingList('invalid-id', validUUID),
     /Invalid UUID format for id/
   );
-  
+
   // Test with invalid user_id
   await assert.rejects(
     async () => repository.deleteShoppingList(validUUID, 'invalid-user'),

@@ -5,7 +5,9 @@
 
 // Load env vars only in development
 if (process.env.NODE_ENV !== 'production') {
-  try { require('dotenv').config(); } catch (e) {}
+  try {
+    require('dotenv').config();
+  } catch (e) {}
 }
 
 const repository = require('../repositories/shoppingListRepository');
@@ -16,12 +18,12 @@ const repository = require('../repositories/shoppingListRepository');
  * @returns {Function} - Handler function
  */
 function buildHandler(repo = repository) {
-  return async function(event) {
+  return async function (event) {
     // Only allow PUT/PATCH requests
     if (event.httpMethod !== 'PUT' && event.httpMethod !== 'PATCH') {
       return {
         statusCode: 405,
-        body: JSON.stringify({ error: 'Method not allowed' })
+        body: JSON.stringify({ error: 'Method not allowed' }),
       };
     }
 
@@ -32,14 +34,14 @@ function buildHandler(repo = repository) {
       if (!itemId) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Missing item ID parameter' })
+          body: JSON.stringify({ error: 'Missing item ID parameter' }),
         };
       }
 
       // Extract updates from request body
       const allowedUpdates = ['is_checked', 'quantity', 'unit_price', 'notes'];
       const updates = {};
-      
+
       for (const field of allowedUpdates) {
         if (requestBody[field] !== undefined) {
           updates[field] = requestBody[field];
@@ -49,7 +51,7 @@ function buildHandler(repo = repository) {
       if (Object.keys(updates).length === 0) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'No valid updates provided' })
+          body: JSON.stringify({ error: 'No valid updates provided' }),
         };
       }
 
@@ -57,14 +59,14 @@ function buildHandler(repo = repository) {
       if (updates.quantity !== undefined && updates.quantity <= 0) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Quantity must be greater than zero' })
+          body: JSON.stringify({ error: 'Quantity must be greater than zero' }),
         };
       }
 
       if (updates.unit_price !== undefined && updates.unit_price < 0) {
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Price cannot be negative' })
+          body: JSON.stringify({ error: 'Price cannot be negative' }),
         };
       }
 
@@ -77,16 +79,15 @@ function buildHandler(repo = repository) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': 'Content-Type',
-          'Access-Control-Allow-Methods': 'PUT, PATCH, OPTIONS'
+          'Access-Control-Allow-Methods': 'PUT, PATCH, OPTIONS',
         },
-        body: JSON.stringify(updatedItem)
+        body: JSON.stringify(updatedItem),
       };
-
     } catch (error) {
       console.error('Error updating shopping list item:', error);
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: error.message || 'Internal server error' })
+        body: JSON.stringify({ error: error.message || 'Internal server error' }),
       };
     }
   };

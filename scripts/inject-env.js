@@ -2,10 +2,10 @@
 
 /**
  * Environment Variable Injection Script
- * 
+ *
  * This script injects environment variables into a JavaScript file
  * that can be loaded by the browser.
- * 
+ *
  * Usage: node scripts/inject-env.js
  */
 
@@ -45,11 +45,11 @@ console.log(`   NODE_ENV: ${NODE_ENV}`);
 
 // Exit with error if required variables are missing
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    console.error('');
-    console.error('⚠️  WARNING: Missing required environment variables!');
-    console.error('   Please set SUPABASE_URL and SUPABASE_ANON_KEY in your deployment platform.');
-    console.error('   For Netlify: Site settings → Environment variables');
-    console.error('');
-    console.error('   The app will not work correctly without these variables.');
-    console.error('');
+  console.error('');
+  console.error('⚠️  WARNING: Missing required environment variables!');
+  console.error('   Please set SUPABASE_URL and SUPABASE_ANON_KEY in your deployment platform.');
+  console.error('   For Netlify: Site settings → Environment variables');
+  console.error('');
+  console.error('   The app will not work correctly without these variables.');
+  console.error('');
 }

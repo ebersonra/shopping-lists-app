@@ -4,7 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
   } catch (e) {}
 }
 
-const controller = require('../controllers/shoppingListController');
+const controller = require('../controllers/marketController');
 
 function buildHandler(ctrl = controller) {
   return async function (event) {
@@ -22,12 +22,11 @@ function buildHandler(ctrl = controller) {
         };
       }
 
-      console.log('Getting shopping lists for user:', params.user_id);
-      console.log('Request params:', params);
+      console.log('Getting markets for user:', params.user_id);
 
-      const result = await ctrl.getShoppingLists(params);
+      const result = await ctrl.getMarkets(params);
 
-      console.log('Shopping lists result:', result);
+      console.log(`Found ${result.length} markets`);
 
       return {
         statusCode: 200,
@@ -37,22 +36,17 @@ function buildHandler(ctrl = controller) {
           'Access-Control-Allow-Headers': 'Content-Type',
           'Access-Control-Allow-Methods': 'GET, OPTIONS',
         },
-        body: JSON.stringify(result),
+        body: JSON.stringify({ markets: result }),
       };
     } catch (e) {
-      console.error('Error in get-shopping-lists:', e);
+      console.error('Error in get-markets:', e);
       console.error('Error stack:', e.stack);
 
       // Determine appropriate status code based on error type
       let statusCode = 500; // Default to server error
 
       // Client errors (4xx)
-      if (
-        e.message.includes('Invalid UUID format') ||
-        e.message.includes('User ID is required') ||
-        e.message.includes('Limit must be') ||
-        e.message.includes('Offset must be')
-      ) {
+      if (e.message.includes('Invalid UUID format') || e.message.includes('User ID is required')) {
         statusCode = 400;
       } else if (e.message.includes('not found') || e.message.includes('Not found')) {
         statusCode = 404;

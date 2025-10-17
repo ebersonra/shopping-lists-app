@@ -79,6 +79,7 @@ shopping-lists-app/
 ## 🚀 Como Executar
 
 1. **Instalar dependências:**
+
    ```bash
    npm install
    ```
@@ -88,6 +89,7 @@ shopping-lists-app/
    - Configure as variáveis do Supabase
 
 3. **Executar o projeto:**
+
    ```bash
    npm start
    ```
@@ -131,12 +133,12 @@ O design system utiliza CSS Custom Properties para:
   --primary-color: #6366f1;
   --background: #0a0a0a;
   --surface: #151515;
-  
+
   /* Tipografia */
   --font-family: 'Inter', system-ui, sans-serif;
   --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
-  
+
   /* Espaçamentos */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
