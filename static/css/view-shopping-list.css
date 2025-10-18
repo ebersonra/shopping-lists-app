@@ -195,6 +195,12 @@
         gap: var(--space-3);
       }
 
+      .category-title .item-price {
+        color: #64748b;
+        font-weight: var(--font-normal);
+        font-size: var(--text-sm);
+      }
+
       .category-icon {
         width: 32px;
         height: 32px;
@@ -272,6 +278,7 @@
         text-align: center;
       }
 
+      /* Item rows within category */
       .item-price {
         color: rgba(255, 255, 255, 0.8);
         font-weight: var(--font-medium);
