@@ -1403,10 +1403,10 @@
       }
 
       .stat-number {
-        font-size: var(--text-2xl);
+        font-size: var(--text-3xl);
         font-weight: var(--font-bold);
         color: var(--primary-400);
-        background: linear-gradient(135deg, var(--primary-400), var(--secondary-400));
+        background: linear-gradient(135deg, #60a5fa, #c084fc);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -1414,8 +1414,10 @@
 
       .stat-text {
         font-size: var(--text-sm);
-        color: var(--neutral-400);
-        font-weight: var(--font-medium);
+        color: #94a3b8;
+        font-weight: var(--font-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
       .recent-activity {
@@ -1423,16 +1425,11 @@
       }
 
       .recent-activity h4 {
-        color: var(--neutral-300);
-        font-size: var(--text-lg);
+        color: #e2e8f0;
+        font-size: var(--text-xl);
         font-weight: var(--font-bold);
         margin-bottom: var(--space-6);
       }
-
-      .recent-activity h4 {
-        color: var(--neutral-300);
-        font-size: var(--text-lg);
-        font-weight: var(--font-bold);
         margin-bottom: var(--space-6);
       }
 
@@ -1478,14 +1475,14 @@
 
       .activity-title {
         font-weight: var(--font-semibold);
-        color: var(--neutral-200);
+        color: #f1f5f9;
         margin-bottom: var(--space-1);
-        font-size: var(--text-sm);
+        font-size: var(--text-base);
       }
 
       .activity-time {
-        color: var(--neutral-500);
-        font-size: var(--text-xs);
+        color: #94a3b8;
+        font-size: var(--text-sm);
       }
 
       /* Settings Tab */
@@ -1494,12 +1491,12 @@
       }
 
       .settings-group h4 {
-        font-size: var(--text-lg);
+        font-size: var(--text-xl);
         font-weight: var(--font-bold);
-        color: var(--neutral-300);
+        color: #e2e8f0;
         margin-bottom: var(--space-6);
         padding-bottom: var(--space-3);
-        border-bottom: 2px solid rgba(148, 163, 184, 0.3);
+        border-bottom: 2px solid rgba(148, 163, 184, 0.4);
       }
 
       .setting-item {
@@ -1526,16 +1523,17 @@
 
       .setting-info label {
         font-weight: var(--font-semibold);
-        color: var(--neutral-200);
+        color: #f1f5f9;
         cursor: pointer;
         display: block;
         margin-bottom: var(--space-1);
+        font-size: var(--text-base);
       }
 
       .setting-info small {
         display: block;
-        color: var(--neutral-500);
-        font-size: var(--text-xs);
+        color: #94a3b8;
+        font-size: var(--text-sm);
         margin-top: var(--space-1);
       }
 
