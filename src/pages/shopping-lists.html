@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Minhas Listas de Compras - Bargainly Shopping</title>
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
     <link rel="stylesheet" href="../../static/css/style.css" />
     <link rel="stylesheet" href="../../static/css/shopping-lists.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,16 +18,12 @@
     <!-- Navigation -->
     <nav class="shopping-nav">
       <div class="nav-container">
-        <div class="nav-brand">
+        <a href="../../index.html" class="nav-brand">
           <div class="nav-logo">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z"
-              />
-            </svg>
+            <img src="../../static/images/logo.svg" alt="Bargainly Shopping Logo" width="24" height="24" />
           </div>
           <h1 class="nav-brand-text">Bargainly Shopping</h1>
-        </div>
+        </a>
 
         <div class="nav-menu">
           <ul class="nav-links">
@@ -191,20 +188,22 @@
           <div class="section-body">
             <!-- Profile Header -->
             <div class="profile-header">
-              <div class="profile-avatar-section">
-                <div class="profile-avatar" id="profileAvatar">U</div>
-                <button class="change-avatar-btn" onclick="generateNewAvatar()">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                    />
-                  </svg>
-                  Novo Avatar
-                </button>
-              </div>
-              <div class="profile-info">
-                <h3 id="profileDisplayName">Nome do Usuário</h3>
-                <p id="profileJoinDate">Membro desde setembro de 2025</p>
+              <div class="profile-top">
+                <div class="profile-avatar-section">
+                  <div class="profile-avatar" id="profileAvatar">U</div>
+                  <button class="change-avatar-btn" onclick="generateNewAvatar()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path
+                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                      />
+                    </svg>
+                    Novo Avatar
+                  </button>
+                </div>
+                <div class="profile-info">
+                  <h3 id="profileDisplayName">Nome do Usuário</h3>
+                  <p id="profileJoinDate">Membro desde setembro de 2025</p>
+                </div>
               </div>
               <div class="profile-stats">
                 <div class="stat-item">
