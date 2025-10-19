@@ -1,0 +1,17 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Shopping bag icon -->
+  <g fill="none" stroke="url(#logoGradient)" stroke-width="2.5">
+    <!-- Bag body -->
+    <path d="M8 13 L6 28 C6 29 7 30 8 30 L24 30 C25 30 26 29 26 28 L24 13 Z"/>
+    <!-- Top line -->
+    <line x1="8" y1="13" x2="24" y2="13"/>
+    <!-- Handle -->
+    <path d="M12 13 C12 9 20 9 20 13"/>
+  </g>
+</svg>
