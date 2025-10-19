@@ -538,9 +538,9 @@
         }
 
         return `
-                <div class="item-row ${item.checked ? 'checked' : ''}" onclick="toggleItem(${item.id})">
+                <div class="item-row ${item.checked ? 'checked' : ''}" onclick="toggleItem('${item.id}')">
                     <input type="checkbox" class="item-checkbox" ${item.checked ? 'checked' : ''} 
-                           onchange="toggleItem(${item.id})" onclick="event.stopPropagation()">
+                           onchange="toggleItem('${item.id}')" onclick="event.stopPropagation()">
                     <div class="item-name">
                         ${escapeHtml(item.name)}
                         ${priceRank}
@@ -549,7 +549,7 @@
                     <div class="item-price">R$ ${item.price.toFixed(2)}</div>
                     <div class="item-total">R$ ${(item.quantity * item.price).toFixed(2)}</div>
                     <div class="item-actions">
-                        <button class="item-action-btn delete" onclick="confirmDeleteItem(${item.id}); event.stopPropagation();" title="Remover item">
+                        <button class="item-action-btn delete" onclick="confirmDeleteItem('${item.id}'); event.stopPropagation();" title="Remover item">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
                             </svg>
@@ -763,19 +763,83 @@
       }
 
       // Mark all items as complete
-      function markAllComplete() {
-        listItems.forEach((item) => (item.checked = true));
-        const groupedItems = groupItemsByCategory(listItems);
-        displayCategories(groupedItems);
-        updateStats();
+      async function markAllComplete() {
+        try {
+          // Update all items on server
+          const updatePromises = listItems.map((item) =>
+            fetch(`/.netlify/functions/update-shopping-list-item?itemId=${item.id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                is_checked: true,
+              }),
+            })
+          );
+
+          const responses = await Promise.all(updatePromises);
+          
+          // Check if all requests succeeded
+          const allSucceeded = responses.every((response) => response.ok);
+          
+          if (!allSucceeded) {
+            throw new Error('Erro ao atualizar alguns itens');
+          }
+
+          // Update local state
+          listItems.forEach((item) => (item.checked = true));
+          
+          // Update display
+          const groupedItems = groupItemsByCategory(listItems);
+          displayCategories(groupedItems);
+          updateStats();
+          
+          showNotification('Todos os itens marcados como comprados', 'success');
+        } catch (error) {
+          console.error('Error marking all items:', error);
+          showNotification('Erro ao marcar todos os itens: ' + error.message, 'error');
+        }
       }
 
       // Clear all checks
-      function clearAllChecks() {
-        listItems.forEach((item) => (item.checked = false));
-        const groupedItems = groupItemsByCategory(listItems);
-        displayCategories(groupedItems);
-        updateStats();
+      async function clearAllChecks() {
+        try {
+          // Update all items on server
+          const updatePromises = listItems.map((item) =>
+            fetch(`/.netlify/functions/update-shopping-list-item?itemId=${item.id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                is_checked: false,
+              }),
+            })
+          );
+
+          const responses = await Promise.all(updatePromises);
+          
+          // Check if all requests succeeded
+          const allSucceeded = responses.every((response) => response.ok);
+          
+          if (!allSucceeded) {
+            throw new Error('Erro ao atualizar alguns itens');
+          }
+
+          // Update local state
+          listItems.forEach((item) => (item.checked = false));
+          
+          // Update display
+          const groupedItems = groupItemsByCategory(listItems);
+          displayCategories(groupedItems);
+          updateStats();
+          
+          showNotification('Todos os itens desmarcados', 'success');
+        } catch (error) {
+          console.error('Error clearing all items:', error);
+          showNotification('Erro ao desmarcar todos os itens: ' + error.message, 'error');
+        }
       }
 
       // Share list
