@@ -781,10 +781,12 @@
           return;
         }
 
+        // Get submit button and store original text
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
         try {
           // Add loading state
-          const submitBtn = form.querySelector('button[type="submit"]');
-          const originalText = submitBtn.innerHTML;
           submitBtn.innerHTML = '<span>Adicionando...</span>';
           submitBtn.disabled = true;
 
@@ -871,10 +873,12 @@
           return;
         }
 
+        // Get submit button and store original text
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
         try {
           // Add loading state
-          const submitBtn = form.querySelector('button[type="submit"]');
-          const originalText = submitBtn.innerHTML;
           submitBtn.innerHTML = '<span>Salvando...</span>';
           submitBtn.disabled = true;
 
