@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Shopping List View</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/view-shopping-list.css">
+</head>
+<body>
+    <main class="main-container">
+        <section class="list-header fade-in">
+            <h1 class="list-title">Compras do Mês</h1>
+            <div class="list-stats">
+                <div class="stat-item">
+                    <span class="stat-value">5</span>
+                    <span class="stat-label">Itens</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="categories-container">
+            <div class="category-section">
+                <div class="category-header">
+                    <div class="category-title">
+                        <div class="category-icon">🥬</div>
+                        Verduras e Legumes
+                    </div>
+                </div>
+                <div class="category-items">
+                    <!-- Normal Item -->
+                    <div class="item-row">
+                        <input type="checkbox" class="item-checkbox">
+                        <div class="item-name">Cebola</div>
+                        <div class="item-quantity">1,88 kg</div>
+                        <div class="item-price">R$ 2,69</div>
+                        <div class="item-total">R$ 5,06</div>
+                        <div class="item-actions">
+                            <button class="item-action-btn edit" title="Editar item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                            <button class="item-action-btn delete" title="Remover item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Checked Item -->
+                    <div class="item-row checked">
+                        <input type="checkbox" class="item-checkbox" checked>
+                        <div class="item-name">Tomate</div>
+                        <div class="item-quantity">2 kg</div>
+                        <div class="item-price">R$ 3,50</div>
+                        <div class="item-total">R$ 7,00</div>
+                        <div class="item-actions">
+                            <button class="item-action-btn edit" title="Editar item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                            <button class="item-action-btn delete" title="Remover item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Another Normal Item -->
+                    <div class="item-row">
+                        <input type="checkbox" class="item-checkbox">
+                        <div class="item-name">Alface</div>
+                        <div class="item-quantity">1 un</div>
+                        <div class="item-price">R$ 2,99</div>
+                        <div class="item-total">R$ 2,99</div>
+                        <div class="item-actions">
+                            <button class="item-action-btn edit" title="Editar item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                            <button class="item-action-btn delete" title="Remover item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
