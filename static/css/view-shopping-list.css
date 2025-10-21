@@ -521,6 +521,11 @@
         color: white;
       }
 
+      .item-action-btn.edit:hover {
+        background: var(--primary-600);
+        color: white;
+      }
+
       .item-action-btn.delete:hover {
         background: var(--error-600);
         color: white;

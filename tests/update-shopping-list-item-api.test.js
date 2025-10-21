@@ -185,6 +185,96 @@ test('update-shopping-list-item API - should successfully update notes', async (
   assert.strictEqual(body.notes, 'Test note');
 });
 
+test('update-shopping-list-item API - should successfully update product_name', async () => {
+  const handler = buildHandler(mockRepository);
+  const event = {
+    httpMethod: 'PUT',
+    queryStringParameters: { itemId: 'test-item-id' },
+    body: JSON.stringify({ product_name: 'Updated Product' }),
+  };
+
+  const response = await handler(event);
+  assert.strictEqual(response.statusCode, 200);
+
+  const body = JSON.parse(response.body);
+  assert.strictEqual(body.product_name, 'Updated Product');
+});
+
+test('update-shopping-list-item API - should return 400 for empty product_name', async () => {
+  const handler = buildHandler(mockRepository);
+  const event = {
+    httpMethod: 'PUT',
+    queryStringParameters: { itemId: 'test-item-id' },
+    body: JSON.stringify({ product_name: '' }),
+  };
+
+  const response = await handler(event);
+  assert.strictEqual(response.statusCode, 400);
+
+  const body = JSON.parse(response.body);
+  assert.strictEqual(body.error, 'Product name cannot be empty');
+});
+
+test('update-shopping-list-item API - should successfully update category', async () => {
+  const handler = buildHandler(mockRepository);
+  const event = {
+    httpMethod: 'PUT',
+    queryStringParameters: { itemId: 'test-item-id' },
+    body: JSON.stringify({ category: 'Frutas' }),
+  };
+
+  const response = await handler(event);
+  assert.strictEqual(response.statusCode, 200);
+
+  const body = JSON.parse(response.body);
+  assert.strictEqual(body.category, 'Frutas');
+});
+
+test('update-shopping-list-item API - should return 400 for empty category', async () => {
+  const handler = buildHandler(mockRepository);
+  const event = {
+    httpMethod: 'PUT',
+    queryStringParameters: { itemId: 'test-item-id' },
+    body: JSON.stringify({ category: '' }),
+  };
+
+  const response = await handler(event);
+  assert.strictEqual(response.statusCode, 400);
+
+  const body = JSON.parse(response.body);
+  assert.strictEqual(body.error, 'Category cannot be empty');
+});
+
+test('update-shopping-list-item API - should successfully update unit', async () => {
+  const handler = buildHandler(mockRepository);
+  const event = {
+    httpMethod: 'PUT',
+    queryStringParameters: { itemId: 'test-item-id' },
+    body: JSON.stringify({ unit: 'kg' }),
+  };
+
+  const response = await handler(event);
+  assert.strictEqual(response.statusCode, 200);
+
+  const body = JSON.parse(response.body);
+  assert.strictEqual(body.unit, 'kg');
+});
+
+test('update-shopping-list-item API - should return 400 for empty unit', async () => {
+  const handler = buildHandler(mockRepository);
+  const event = {
+    httpMethod: 'PUT',
+    queryStringParameters: { itemId: 'test-item-id' },
+    body: JSON.stringify({ unit: '' }),
+  };
+
+  const response = await handler(event);
+  assert.strictEqual(response.statusCode, 400);
+
+  const body = JSON.parse(response.body);
+  assert.strictEqual(body.error, 'Unit cannot be empty');
+});
+
 test('update-shopping-list-item API - should successfully update multiple fields', async () => {
   const handler = buildHandler(mockRepository);
   const event = {
