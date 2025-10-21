@@ -332,7 +332,9 @@
             <div class="form-actions">
               <button type="submit" class="action-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                  <path
+                    d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"
+                  />
                 </svg>
                 Salvar Alterações
               </button>
@@ -399,10 +401,12 @@
         });
 
         // Setup edit item form
-        document.getElementById('editItemFormElement').addEventListener('submit', async function (e) {
-          e.preventDefault();
-          await updateItem();
-        });
+        document
+          .getElementById('editItemFormElement')
+          .addEventListener('submit', async function (e) {
+            e.preventDefault();
+            await updateItem();
+          });
       });
 
       // Setup event listeners
@@ -781,10 +785,12 @@
           return;
         }
 
+        // Get submit button and store original text
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
         try {
           // Add loading state
-          const submitBtn = form.querySelector('button[type="submit"]');
-          const originalText = submitBtn.innerHTML;
           submitBtn.innerHTML = '<span>Adicionando...</span>';
           submitBtn.disabled = true;
 
@@ -871,10 +877,12 @@
           return;
         }
 
+        // Get submit button and store original text
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
         try {
           // Add loading state
-          const submitBtn = form.querySelector('button[type="submit"]');
-          const originalText = submitBtn.innerHTML;
           submitBtn.innerHTML = '<span>Salvando...</span>';
           submitBtn.disabled = true;
 
@@ -1005,22 +1013,22 @@
           );
 
           const responses = await Promise.all(updatePromises);
-          
+
           // Check if all requests succeeded
           const allSucceeded = responses.every((response) => response.ok);
-          
+
           if (!allSucceeded) {
             throw new Error('Erro ao atualizar alguns itens');
           }
 
           // Update local state
           listItems.forEach((item) => (item.checked = true));
-          
+
           // Update display
           const groupedItems = groupItemsByCategory(listItems);
           displayCategories(groupedItems);
           updateStats();
-          
+
           showNotification('Todos os itens marcados como comprados', 'success');
         } catch (error) {
           console.error('Error marking all items:', error);
@@ -1045,22 +1053,22 @@
           );
 
           const responses = await Promise.all(updatePromises);
-          
+
           // Check if all requests succeeded
           const allSucceeded = responses.every((response) => response.ok);
-          
+
           if (!allSucceeded) {
             throw new Error('Erro ao atualizar alguns itens');
           }
 
           // Update local state
           listItems.forEach((item) => (item.checked = false));
-          
+
           // Update display
           const groupedItems = groupItemsByCategory(listItems);
           displayCategories(groupedItems);
           updateStats();
-          
+
           showNotification('Todos os itens desmarcados', 'success');
         } catch (error) {
           console.error('Error clearing all items:', error);
