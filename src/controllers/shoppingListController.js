@@ -19,7 +19,7 @@ async function createShoppingList(data, srv = service) {
   }
 
   // Extract list data and items from request
-  const { title, description, shopping_date, market_id, user_id, items } = data;
+  const { title, description, shopping_date, market_id, payment_id, user_id, items } = data;
 
   if (!user_id) {
     throw new Error('User ID is required');
@@ -36,6 +36,7 @@ async function createShoppingList(data, srv = service) {
     description,
     shopping_date,
     market_id,
+    payment_id,
   });
 
   const listValidation = shoppingList.validate();
