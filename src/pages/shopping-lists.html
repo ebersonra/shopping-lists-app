@@ -1154,6 +1154,12 @@
                             </svg>
                             Compartilhar
                         </button>
+                        <button class="list-action danger" onclick="deleteList('${list.id}', '${list.title}'); event.stopPropagation()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                            </svg>
+                            Excluir
+                        </button>
                     </div>
                 </div>
             `
@@ -1204,6 +1210,48 @@
               'success'
             );
           });
+        }
+      }
+
+      // Delete a shopping list
+      async function deleteList(listId, listTitle) {
+        // Confirm deletion
+        const confirmed = confirm(
+          `Tem certeza que deseja excluir a lista "${listTitle}"?\n\nEsta ação não pode ser desfeita.`
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        try {
+          const user_id = await getUserId();
+
+          // Call the delete API
+          const response = await fetch('/.netlify/functions/delete-shopping-list', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: listId,
+              user_id: user_id,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erro ao excluir lista');
+          }
+
+          // Show success message
+          showNotification('Lista excluída com sucesso!', 'success');
+
+          // Reload the lists
+          await loadShoppingLists();
+        } catch (error) {
+          console.error('Error deleting list:', error);
+          showNotification(`Erro ao excluir lista: ${error.message}`, 'error');
         }
       }
 

@@ -573,6 +573,18 @@
         border-color: rgba(14, 165, 233, 0.5);
       }
 
+      .list-action.danger {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+      }
+
+      .list-action.danger:hover {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.5);
+        color: #dc2626;
+      }
+
       /* Enhanced Share Code Input */
       .share-code-section {
         text-align: center;
