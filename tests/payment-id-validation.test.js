@@ -1,6 +1,7 @@
 // tests/payment-id-validation.test.js
 const test = require('node:test');
 const assert = require('node:assert');
+const { validateUUID } = require('../src/utils/validation');
 
 /**
  * Tests for payment_id UUID validation in create-shopping-list
@@ -11,10 +12,9 @@ const assert = require('node:assert');
  * - Empty values should be converted to null
  */
 
-// Simulate the UUID validation logic from the HTML form
+// Use the shared validation utility
 function validatePaymentId(paymentSelectValue) {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  return paymentSelectValue && uuidRegex.test(paymentSelectValue) ? paymentSelectValue : null;
+  return validateUUID(paymentSelectValue);
 }
 
 test('payment_id validation - should return null for "credit"', () => {
