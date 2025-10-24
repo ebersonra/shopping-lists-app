@@ -76,6 +76,12 @@
               </select>
             </div>
             <div class="input-group">
+              <label for="paymentSelect">Forma de Pagamento</label>
+              <select id="paymentSelect" name="payment">
+                <option value="">Selecione uma forma de pagamento (opcional)</option>
+              </select>
+            </div>
+            <div class="input-group">
               <label for="listDescription">Descrição</label>
               <textarea
                 id="listDescription"
@@ -202,6 +208,7 @@
         loadUserData();
         setupForm();
         populateMarkets();
+        populatePaymentMethods();
         setupEventListeners();
       });
 
@@ -272,6 +279,40 @@
           });
         } catch (error) {
           console.error('Error loading markets:', error);
+        }
+      }
+
+      // Load payment methods from localStorage (simplified for now)
+      // In a production app, this would fetch from an API
+      async function loadPaymentMethods() {
+        try {
+          // For now, return hardcoded payment types that users can select
+          // In a real implementation, this would fetch user's saved payment methods from the database
+          return [
+            { id: 'debit', type: 'debit', description: 'Cartão de Débito' },
+            { id: 'credit', type: 'credit', description: 'Cartão de Crédito' },
+            { id: 'pix', type: 'pix', description: 'PIX' },
+          ];
+        } catch (error) {
+          console.error('Error loading payment methods:', error);
+          return [];
+        }
+      }
+
+      // Load payment methods into select
+      async function populatePaymentMethods() {
+        try {
+          const paymentMethods = await loadPaymentMethods();
+          const select = document.getElementById('paymentSelect');
+
+          paymentMethods.forEach((payment) => {
+            const option = document.createElement('option');
+            option.value = payment.id;
+            option.textContent = payment.description;
+            select.appendChild(option);
+          });
+        } catch (error) {
+          console.error('Error loading payment methods:', error);
         }
       }
 
@@ -454,6 +495,7 @@
           description: document.getElementById('listDescription').value.trim(),
           shoppingDate: document.getElementById('shoppingDate').value,
           marketId: document.getElementById('marketSelect').value || null,
+          paymentId: document.getElementById('paymentSelect').value || null,
           items: [],
         };
 
@@ -514,6 +556,7 @@
             description: formData.description,
             shopping_date: formData.shoppingDate,
             market_id: formData.marketId,
+            payment_id: formData.paymentId,
             items: formData.items,
           };
 

@@ -10,6 +10,7 @@ class ShoppingList {
     this.description = data.description || null;
     this.shopping_date = data.shopping_date || null;
     this.market_id = data.market_id || null;
+    this.payment_id = data.payment_id || null;
     this.total_amount = data.total_amount || 0;
     this.share_code = data.share_code || null;
     this.is_completed = data.is_completed || false;
@@ -88,6 +89,7 @@ class ShoppingList {
       description: this.description ? this.description.trim() : null,
       shopping_date: this.shopping_date,
       market_id: this.market_id || null,
+      payment_id: this.payment_id || null,
       total_amount: parseFloat(this.total_amount) || 0,
       is_completed: Boolean(this.is_completed),
     };

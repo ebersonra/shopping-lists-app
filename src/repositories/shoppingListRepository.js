@@ -65,6 +65,7 @@ async function createShoppingList(listData, items = []) {
       description: listData.description || null,
       shopping_date: listData.shopping_date,
       market_id: listData.market_id || null,
+      payment_id: listData.payment_id || null,
     })
     .select()
     .single();
