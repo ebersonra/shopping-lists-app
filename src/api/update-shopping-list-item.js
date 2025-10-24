@@ -39,7 +39,15 @@ function buildHandler(repo = repository) {
       }
 
       // Extract updates from request body
-      const allowedUpdates = ['is_checked', 'quantity', 'unit_price', 'notes', 'product_name', 'category', 'unit'];
+      const allowedUpdates = [
+        'is_checked',
+        'quantity',
+        'unit_price',
+        'notes',
+        'product_name',
+        'category',
+        'unit',
+      ];
       const updates = {};
 
       for (const field of allowedUpdates) {
@@ -56,14 +64,20 @@ function buildHandler(repo = repository) {
       }
 
       // Validate required fields if they are being updated
-      if (updates.product_name !== undefined && (!updates.product_name || updates.product_name.trim().length === 0)) {
+      if (
+        updates.product_name !== undefined &&
+        (!updates.product_name || updates.product_name.trim().length === 0)
+      ) {
         return {
           statusCode: 400,
           body: JSON.stringify({ error: 'Product name cannot be empty' }),
         };
       }
 
-      if (updates.category !== undefined && (!updates.category || updates.category.trim().length === 0)) {
+      if (
+        updates.category !== undefined &&
+        (!updates.category || updates.category.trim().length === 0)
+      ) {
         return {
           statusCode: 400,
           body: JSON.stringify({ error: 'Category cannot be empty' }),

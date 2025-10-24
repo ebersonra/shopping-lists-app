@@ -3,11 +3,13 @@
 ## ✅ Problemas Resolvidos
 
 ### 1. ❌ ANTES: Timeout no Deploy
+
 ```
 Error: The action 'Deploy to Netlify' has timed out after 5 minutes.
 ```
 
 ### ✅ DEPOIS: Problema Resolvido
+
 - ⏱️ **Timeout aumentado:** 5min → 10min (staging) / 15min (production)
 - 🔧 **Variáveis de ambiente:** Injetadas no build e Netlify Functions
 - 📦 **Build otimizado:** NODE_ENV configurado corretamente
@@ -17,6 +19,7 @@ Error: The action 'Deploy to Netlify' has timed out after 5 minutes.
 ## 🆕 Nova Funcionalidade: Deploy de Produção
 
 ### ❌ ANTES: Um único workflow
+
 - Push em `main` → deploy direto (sem controle)
 - Sem diferenciação staging/produção
 - Sem versionamento adequado
@@ -24,12 +27,14 @@ Error: The action 'Deploy to Netlify' has timed out after 5 minutes.
 ### ✅ DEPOIS: Dois ambientes separados
 
 #### 🧪 **Staging (Testes)**
+
 - **Trigger:** Push automático em `main`
 - **Propósito:** Testar antes de produção
 - **URL:** Preview/staging URL
 - **Configuração:** `production-deploy: false`
 
 #### 🌍 **Production (Real)**
+
 - **Trigger:** Releases/Tags (v1.0.0, v1.1.0, etc.)
 - **Propósito:** Deploy controlado para usuários finais
 - **URL:** URL de produção principal
@@ -64,10 +69,12 @@ Error: The action 'Deploy to Netlify' has timed out after 5 minutes.
 ### Secrets do GitHub (5 totais)
 
 **Já existentes (verificar):**
+
 - ✅ `NETLIFY_AUTH_TOKEN`
 - ✅ `NETLIFY_SITE_ID`
 
 **Novos (adicionar agora):**
+
 - 🆕 `SUPABASE_URL`
 - 🆕 `SUPABASE_ANON_KEY`
 - 🆕 `SUPABASE_SERVICE_API_KEY`
@@ -111,6 +118,7 @@ git push origin main
 ### Para Deploy de Produção
 
 **Opção 1: Via GitHub UI (Mais fácil)**
+
 ```
 1. GitHub → Releases → Draft new release
 2. Choose tag → Criar nova: v1.0.0
@@ -123,6 +131,7 @@ Deploy automático inicia!
 ```
 
 **Opção 2: Via Terminal**
+
 ```bash
 # Criar tag
 git tag -a v1.0.0 -m "Release v1.0.0"
@@ -140,16 +149,16 @@ gh release create v1.0.0 \
 
 ## 📊 Comparação: Antes vs Depois
 
-| Aspecto | ❌ Antes | ✅ Depois |
-|---------|---------|-----------|
-| **Timeout** | 5 minutos | 10 min (staging) / 15 min (prod) |
-| **Ambientes** | 1 (main) | 2 (staging + production) |
-| **Versionamento** | Nenhum | Semantic Versioning (v1.0.0) |
-| **Controle** | Deploy automático sempre | Staging auto / Produção controlada |
-| **Testes em Prod** | Opcional | Obrigatórios |
-| **Env Variables** | Parciais | Completas (build + functions) |
-| **Documentação** | Básica | Completa com guias |
-| **Rollback** | Difícil | Fácil (via tags) |
+| Aspecto            | ❌ Antes                 | ✅ Depois                          |
+| ------------------ | ------------------------ | ---------------------------------- |
+| **Timeout**        | 5 minutos                | 10 min (staging) / 15 min (prod)   |
+| **Ambientes**      | 1 (main)                 | 2 (staging + production)           |
+| **Versionamento**  | Nenhum                   | Semantic Versioning (v1.0.0)       |
+| **Controle**       | Deploy automático sempre | Staging auto / Produção controlada |
+| **Testes em Prod** | Opcional                 | Obrigatórios                       |
+| **Env Variables**  | Parciais                 | Completas (build + functions)      |
+| **Documentação**   | Básica                   | Completa com guias                 |
+| **Rollback**       | Difícil                  | Fácil (via tags)                   |
 
 ---
 
@@ -179,7 +188,7 @@ gh release create v1.0.0 \
 
 - [ ] **1. Adicionar secrets no GitHub**
   - [ ] SUPABASE_URL
-  - [ ] SUPABASE_ANON_KEY  
+  - [ ] SUPABASE_ANON_KEY
   - [ ] SUPABASE_SERVICE_API_KEY
 
 - [ ] **2. Verificar secrets existentes**
@@ -222,15 +231,19 @@ gh release create v1.0.0 \
 ## 📚 Documentação Completa
 
 ### Para começar rápido:
+
 👉 **[.github/CHANGES_SUMMARY.md]** - Resumo detalhado (você está aqui)
 
 ### Para entender os workflows:
+
 👉 **[.github/WORKFLOWS.md]** - Visão geral técnica
 
 ### Para fazer deploys:
+
 👉 **[.github/DEPLOYMENT_GUIDE.md]** - Guia passo a passo completo
 
 ### Para troubleshooting:
+
 👉 **[.github/DEPLOYMENT_GUIDE.md]** - Seção de troubleshooting detalhada
 
 ---
@@ -254,18 +267,23 @@ gh release create v1.0.0 \
 ## ❓ Perguntas Frequentes
 
 ### P: O workflow antigo vai quebrar?
+
 **R:** Não! Ele foi atualizado, não removido. Agora faz deploy para staging.
 
 ### P: Preciso fazer deploy manual sempre?
+
 **R:** Não! Staging é automático (push em main). Apenas produção usa releases.
 
 ### P: E se eu não quiser usar releases?
+
 **R:** Pode fazer deploy manual: Actions → Deploy to Production → Run workflow
 
 ### P: Os secrets são obrigatórios?
+
 **R:** Sim, sem eles o build vai falhar pois o código precisa das credenciais Supabase.
 
 ### P: Posso voltar para versão anterior?
+
 **R:** Sim! É só fazer deploy manual da tag anterior (ex: v1.0.0).
 
 ---
@@ -282,4 +300,4 @@ gh release create v1.0.0 \
 
 **Status:** ✅ Pronto para uso  
 **Criado:** 24 de outubro de 2025  
-**Versão:** 1.0.0  
+**Versão:** 1.0.0
