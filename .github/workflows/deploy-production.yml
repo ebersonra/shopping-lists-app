@@ -52,8 +52,6 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
       - name: Run tests
         run: npm test
@@ -77,9 +75,6 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_API_KEY: ${{ secrets.SUPABASE_SERVICE_API_KEY }}
         timeout-minutes: 15
 
       - name: Create deployment summary
@@ -92,9 +87,7 @@ jobs:
           echo "**Netlify Logs:** ${{ steps.deploy.outputs.logs-url }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Environment Variables" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ SUPABASE_URL configured" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ SUPABASE_ANON_KEY configured" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ SUPABASE_SERVICE_API_KEY configured" >> $GITHUB_STEP_SUMMARY
+          echo "- NODE_ENV: production" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
           echo "1. Verify the deployment at the URL above" >> $GITHUB_STEP_SUMMARY

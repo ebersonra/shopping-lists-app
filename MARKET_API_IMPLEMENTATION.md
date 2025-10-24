@@ -7,7 +7,9 @@ Implemented the `loadMarkets()` function to fetch markets from the Supabase data
 ## Changes Made
 
 ### 1. Repository Layer (`src/repositories/marketRepository.js`)
+
 Created a new repository for market data access with the following functions:
+
 - `getMarkets(user_id)` - Fetch all markets for a user
 - `getMarketById(id, user_id)` - Get a specific market by ID
 - `createMarket(marketData)` - Create a new market
@@ -15,27 +17,34 @@ Created a new repository for market data access with the following functions:
 - `deleteMarket(id, user_id)` - Soft delete a market
 
 **Key Features:**
+
 - UUID validation for user_id and market_id
 - Filters out soft-deleted markets (`deleted_at IS NULL`)
 - Orders markets alphabetically by name
 - Proper error handling and logging
 
 ### 2. Service Layer (`src/services/marketService.js`)
+
 Created business logic layer that:
+
 - Validates input parameters
 - Delegates to repository
 - Enforces business rules (e.g., market name is required)
 - Uses dependency injection for testability
 
 ### 3. Controller Layer (`src/controllers/marketController.js`)
+
 Created HTTP controller that:
+
 - Handles request/response mapping
 - Validates required fields
 - Returns appropriate HTTP status codes
 - Manages error responses
 
 ### 4. API Endpoint (`src/api/get-markets.js`)
+
 Created Netlify serverless function:
+
 - **Method:** GET
 - **Path:** `/.netlify/functions/get-markets`
 - **Query Parameters:**
@@ -59,6 +68,7 @@ Created Netlify serverless function:
   ```
 
 **Features:**
+
 - CORS headers for cross-origin requests
 - Proper HTTP status codes (400, 403, 404, 500)
 - Error logging for debugging
@@ -67,18 +77,19 @@ Created Netlify serverless function:
 ### 5. Frontend Updates (`src/pages/create-shopping-list.html`)
 
 #### Updated `loadMarkets()` function:
+
 ```javascript
 async function loadMarkets() {
   try {
     const user_id = await getUserId();
-    
+
     const response = await fetch(`/.netlify/functions/get-markets?user_id=${user_id}`);
-    
+
     if (!response.ok) {
       console.error('Failed to load markets:', response.status);
       return [];
     }
-    
+
     const data = await response.json();
     return data.markets || [];
   } catch (error) {
@@ -89,6 +100,7 @@ async function loadMarkets() {
 ```
 
 #### Updated `populateMarkets()` function:
+
 - Uses correct property names (`name` and `address` instead of `nome` and `endereco`)
 - Handles cases where address is null
 - Gracefully handles errors
@@ -96,7 +108,9 @@ async function loadMarkets() {
 ## Testing
 
 ### Unit Tests (`tests/marketService.test.js`)
+
 Added 8 unit tests covering:
+
 - ✅ Get markets for user
 - ✅ Require user_id validation
 - ✅ Get market by ID
@@ -107,7 +121,9 @@ Added 8 unit tests covering:
 - ✅ Error handling
 
 ### Integration Tests (`tests/get-markets-api.test.js`)
+
 Added 5 integration tests covering:
+
 - ✅ Return 400 when user_id is missing
 - ✅ Return 405 for non-GET methods
 - ✅ Return markets for valid user
@@ -115,7 +131,9 @@ Added 5 integration tests covering:
 - ✅ Return empty array for user with no markets
 
 ### Test Results
+
 All 71 tests passing:
+
 ```
 # tests 71
 # pass 71
@@ -125,6 +143,7 @@ All 71 tests passing:
 ## Database Schema
 
 The implementation uses the existing `markets` table:
+
 ```sql
 CREATE TABLE markets (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -144,6 +163,7 @@ CREATE TABLE markets (
 ## Usage
 
 ### For Users
+
 1. Create markets in the database (via future admin interface)
 2. Open create shopping list page
 3. Markets are automatically loaded in the dropdown
@@ -151,7 +171,9 @@ CREATE TABLE markets (
 5. Create shopping list
 
 ### For Developers
+
 To fetch markets programmatically:
+
 ```javascript
 // Get user ID
 const user_id = await getUserId();
@@ -192,6 +214,7 @@ The implementation handles various error scenarios:
 ## Files Created/Modified
 
 ### Created:
+
 - `src/repositories/marketRepository.js` (224 lines)
 - `src/services/marketService.js` (117 lines)
 - `src/controllers/marketController.js` (121 lines)
@@ -201,6 +224,7 @@ The implementation handles various error scenarios:
 - `MARKET_API_IMPLEMENTATION.md` (this file)
 
 ### Modified:
+
 - `src/pages/create-shopping-list.html` (loadMarkets and populateMarkets functions)
 
 ## Architecture
@@ -222,6 +246,7 @@ Supabase Database
 ```
 
 This layered architecture provides:
+
 - **Separation of concerns**: Each layer has a single responsibility
 - **Testability**: Easy to mock dependencies for unit testing
 - **Maintainability**: Changes in one layer don't affect others

@@ -46,6 +46,7 @@ Este documento descreve os workflows do GitHub Actions configurados para o Shopp
 - ⚡ Deploy das Netlify Functions (src/api)
 
 **Configurações:**
+
 - `production-deploy: false` - Não sobrescreve produção
 - `timeout-minutes: 10` - Aumentado para evitar timeouts
 - Variáveis de ambiente injetadas no build e Functions
@@ -76,6 +77,7 @@ Este documento descreve os workflows do GitHub Actions configurados para o Shopp
 - 📊 Gera relatório detalhado de deploy
 
 **Configurações:**
+
 - `production-deploy: true` - Deploy de produção real
 - `timeout-minutes: 15` - Mais tempo para garantir sucesso
 - `continue-on-error: false` - Testes devem passar
@@ -160,13 +162,13 @@ Para que os workflows funcionem corretamente, você precisa configurar os seguin
 
 ### Resumo dos Secrets
 
-| Secret | Onde obter | Usado em | Segurança |
-|--------|-----------|----------|-----------|
-| `NETLIFY_AUTH_TOKEN` | Netlify User Settings | Deploy | 🔒 Privado |
-| `NETLIFY_SITE_ID` | Netlify Site Settings | Deploy | 🔒 Privado |
-| `SUPABASE_URL` | Supabase API Settings | Build + Functions | ✅ Público |
-| `SUPABASE_ANON_KEY` | Supabase API Settings | Build (frontend) | ✅ Público (com RLS) |
-| `SUPABASE_SERVICE_API_KEY` | Supabase API Settings | Functions (backend) | 🔒 Muito Privado |
+| Secret                     | Onde obter            | Usado em            | Segurança            |
+| -------------------------- | --------------------- | ------------------- | -------------------- |
+| `NETLIFY_AUTH_TOKEN`       | Netlify User Settings | Deploy              | 🔒 Privado           |
+| `NETLIFY_SITE_ID`          | Netlify Site Settings | Deploy              | 🔒 Privado           |
+| `SUPABASE_URL`             | Supabase API Settings | Build + Functions   | ✅ Público           |
+| `SUPABASE_ANON_KEY`        | Supabase API Settings | Build (frontend)    | ✅ Público (com RLS) |
+| `SUPABASE_SERVICE_API_KEY` | Supabase API Settings | Functions (backend) | 🔒 Muito Privado     |
 
 ## 🎯 Como Usar
 
@@ -190,7 +192,7 @@ Para que os workflows funcionem corretamente, você precisa configurar os seguin
    - Escolha a branch e clique em **Run workflow**
 
 4. **Para fazer deploy para produção:**
-   
+
    **Opção A: Criar Release via GitHub (Recomendado)**
    1. Vá em **Releases** no GitHub
    2. Clique em **"Draft a new release"**
@@ -198,15 +200,16 @@ Para que os workflows funcionem corretamente, você precisa configurar os seguin
    4. Preencha título e descrição
    5. Clique em **"Publish release"**
    6. O deploy para produção inicia automaticamente
-   
+
    **Opção B: Criar Tag via Git CLI**
+
    ```bash
    git tag -a v1.0.0 -m "Release version 1.0.0"
    git push origin v1.0.0
    # Depois criar release no GitHub ou via gh CLI
    gh release create v1.0.0 --title "v1.0.0" --notes "Release notes"
    ```
-   
+
    **Opção C: Deploy Manual de Produção**
    1. Vá em **Actions** → "Deploy to Production"
    2. Clique em **Run workflow**
@@ -306,6 +309,7 @@ Você pode criar workflows separados para staging e produção, ou adicionar ló
 **Problema resolvido:** O timeout foi aumentado de 5 para 10 minutos (staging) e 15 minutos (produção).
 
 Se ainda ocorrer timeout:
+
 1. Verifique o tamanho dos arquivos sendo enviados
 2. Considere usar `.gitignore` para excluir arquivos desnecessários
 3. Verifique o status do Netlify: https://www.netlifystatus.com/
@@ -313,6 +317,7 @@ Se ainda ocorrer timeout:
 ### Erro: Secrets não configurados
 
 Verifique se todos os 5 secrets estão configurados:
+
 - Settings → Secrets and variables → Actions → Repository secrets
 
 ### Erro: Tests failing em produção
@@ -320,6 +325,7 @@ Verifique se todos os 5 secrets estão configurados:
 O deploy de produção **bloqueia** se os testes falharem. Isso é intencional para garantir qualidade.
 
 Para corrigir:
+
 1. Rode `npm test` localmente
 2. Corrija os testes que falharam
 3. Faça commit das correções

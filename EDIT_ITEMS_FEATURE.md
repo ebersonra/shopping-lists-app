@@ -15,10 +15,10 @@ Esta funcionalidade permite aos usuários editar itens já adicionados às suas 
 
 2. **Modal de Edição**
    - Formulário completo com todos os campos editáveis:
-     - Nome do Produto (product_name) *obrigatório*
-     - Categoria *obrigatória*
-     - Quantidade *obrigatória*
-     - Unidade *obrigatória*
+     - Nome do Produto (product*name) \_obrigatório*
+     - Categoria _obrigatória_
+     - Quantidade _obrigatória_
+     - Unidade _obrigatória_
      - Preço Unitário (opcional)
      - Observações (opcional)
    - Design consistente com o formulário de adição de itens
@@ -82,9 +82,11 @@ Novo estilo adicionado em `static/css/view-shopping-list.css`:
 ## 📸 Screenshots
 
 ### Botão de Edição
+
 ![Edit Feature Demo](https://github.com/user-attachments/assets/2f7769fd-15bd-4645-949c-0495ececc783)
 
 ### Botão com Hover Azul
+
 ![Edit Button Hover](https://github.com/user-attachments/assets/2e481d5f-5f9f-4c72-9268-94fc1b73cd5f)
 
 ## 🔒 Segurança
@@ -135,7 +137,7 @@ Todos os 91 testes devem passar com sucesso.
 ✅ Recalcular todos os valores após edição  
 ✅ Validação completa dos campos  
 ✅ Testes abrangentes  
-✅ Interface intuitiva  
+✅ Interface intuitiva
 
 ## 📚 Estrutura do Código
 

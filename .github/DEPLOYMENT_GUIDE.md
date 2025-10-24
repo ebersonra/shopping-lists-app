@@ -48,10 +48,12 @@ Este projeto possui **dois ambientes de deploy** configurados com GitHub Actions
 **Propósito:** Validar código em cada PR e push
 
 **Executa em:**
+
 - Pull requests para `main` e `develop`
 - Pushes para `main` e `develop`
 
 **Ações:**
+
 - ✅ Build do projeto
 - ✅ Verificação de formatação (Prettier)
 - ✅ Testes automatizados
@@ -64,10 +66,12 @@ Este projeto possui **dois ambientes de deploy** configurados com GitHub Actions
 **Propósito:** Deploy automático para ambiente de staging/testes
 
 **Executa em:**
+
 - ✅ Push para branch `main`
 - 🔘 Manual via "Run workflow"
 
 **O que faz:**
+
 1. Faz checkout do código
 2. Instala Node.js 18.x
 3. Instala dependências (`npm ci`)
@@ -76,12 +80,14 @@ Este projeto possui **dois ambientes de deploy** configurados com GitHub Actions
 6. Adiciona comentários nos commits
 
 **Configurações:**
+
 - `production-deploy: false` (não sobrescreve produção)
 - `timeout: 10 minutes` (aumentado do original 5min)
 - Variáveis de ambiente injetadas no build
 - Netlify Functions em `src/api`
 
 **URL Gerado:**
+
 - Preview URL: `https://deploy-preview-{pr-number}--{site-name}.netlify.app`
 - Staging URL: `https://{branch}--{site-name}.netlify.app`
 
@@ -92,10 +98,12 @@ Este projeto possui **dois ambientes de deploy** configurados com GitHub Actions
 **Propósito:** Deploy controlado para produção usando releases
 
 **Executa em:**
+
 - ✅ **Ao publicar uma release** no GitHub
 - 🔘 **Manualmente** via "Run workflow" (pode especificar tag)
 
 **O que faz:**
+
 1. Faz checkout da tag de release
 2. Instala Node.js 18.x
 3. Instala dependências (`npm ci`)
@@ -105,6 +113,7 @@ Este projeto possui **dois ambientes de deploy** configurados com GitHub Actions
 7. Gera relatório detalhado de deploy
 
 **Configurações:**
+
 - `production-deploy: true` (sobrescreve produção)
 - `timeout: 15 minutes` (mais tempo para produção)
 - `continue-on-error: false` (testes devem passar)
@@ -112,6 +121,7 @@ Este projeto possui **dois ambientes de deploy** configurados com GitHub Actions
 - Deployment environment: `production`
 
 **Segurança:**
+
 - Testes **devem passar** antes do deploy
 - Usa GitHub Environments para proteção
 - Deploy message inclui tag e nome da release
@@ -127,11 +137,13 @@ Configure os seguintes secrets no GitHub:
 ### Secrets do Netlify
 
 #### `NETLIFY_AUTH_TOKEN`
+
 - **Obter em:** https://app.netlify.com/user/applications
 - **Caminho:** User settings → Applications → Personal access tokens → New access token
 - **Exemplo:** `nfp_ABC123...XYZ789`
 
 #### `NETLIFY_SITE_ID`
+
 - **Obter em:** https://app.netlify.com
 - **Caminho:** Seu site → Site settings → General → Site details → Site ID
 - **Exemplo:** `abc12345-6789-def0-1234-56789abcdef0`
@@ -139,12 +151,14 @@ Configure os seguintes secrets no GitHub:
 ### Secrets do Supabase
 
 #### `SUPABASE_URL`
+
 - **Obter em:** https://app.supabase.com/project/SEU_PROJETO/settings/api
 - **Localização:** Project URL
 - **Exemplo:** `https://qtrbojicgwzbnolktwjp.supabase.co`
 - **Usado em:** Build (frontend) e Netlify Functions
 
 #### `SUPABASE_ANON_KEY`
+
 - **Obter em:** https://app.supabase.com/project/SEU_PROJETO/settings/api
 - **Localização:** Project API keys → anon public
 - **Exemplo:** `eyJhbGci...` (JWT token)
@@ -152,6 +166,7 @@ Configure os seguintes secrets no GitHub:
 - **Nota:** Esta chave é pública e protegida por RLS
 
 #### `SUPABASE_SERVICE_API_KEY`
+
 - **Obter em:** https://app.supabase.com/project/SEU_PROJETO/settings/api
 - **Localização:** Project API keys → service_role (clicar em "Reveal")
 - **Exemplo:** `eyJhbGci...` (JWT token)
@@ -165,17 +180,21 @@ Configure os seguintes secrets no GitHub:
 ### Deploy para Staging (Automático)
 
 **Opção 1: Push direto para main**
+
 ```bash
 git checkout main
 git merge develop
 git push origin main
 ```
+
 O GitHub Actions automaticamente:
+
 - Executa o build
 - Faz deploy para staging
 - Comenta no commit com URL
 
 **Opção 2: Deploy manual**
+
 1. Acesse: GitHub → Actions → "Deploy to Staging"
 2. Clique em "Run workflow"
 3. Selecione branch `main`
@@ -197,20 +216,25 @@ O GitHub Actions automaticamente:
 6. **Target:** selecione `main` (ou branch desejada)
 7. **Release title:** Ex: "Version 1.0.0 - Initial Release"
 8. **Describe this release:** Adicione changelog:
+
    ```markdown
    ## 🚀 Features
+
    - Implementado sistema de listas de compras
    - Adicionado suporte a múltiplos usuários
    - Interface responsiva com tema escuro
-   
+
    ## 🐛 Bug Fixes
+
    - Corrigido erro ao deletar items
    - Melhorada performance das queries
-   
+
    ## 📚 Documentation
+
    - Adicionado guia de deploy
    - Atualizado README
    ```
+
 9. Marque **"Set as the latest release"**
 10. Clique em **"Publish release"**
 
@@ -237,6 +261,7 @@ gh release create v1.0.0 \
 #### Passo 2: Deploy Automático
 
 Ao publicar a release, o GitHub Actions **automaticamente**:
+
 1. ✅ Faz checkout do código da tag
 2. ✅ Instala dependências
 3. ✅ Executa build
@@ -245,6 +270,7 @@ Ao publicar a release, o GitHub Actions **automaticamente**:
 6. ✅ Gera relatório de deploy
 
 **Monitorar Deploy:**
+
 1. Acesse: GitHub → Actions → "Deploy to Production"
 2. Veja o workflow em execução
 3. Ao final, veja o summary com:
@@ -301,11 +327,13 @@ Use o formato: `vMAJOR.MINOR.PATCH`
 Após deploy para **Production**, verifique:
 
 #### 1. Acesso e Carregamento
+
 - [ ] Site carrega sem erros
 - [ ] CSS e JavaScript carregam corretamente
 - [ ] Imagens e assets carregam
 
 #### 2. Funcionalidades Críticas
+
 - [ ] Login/criação de usuário funciona
 - [ ] Criar nova lista funciona
 - [ ] Adicionar items funciona
@@ -314,6 +342,7 @@ Após deploy para **Production**, verifique:
 - [ ] Compartilhar lista via código funciona
 
 #### 3. Console do Navegador
+
 ```javascript
 // Abrir DevTools (F12) e verificar:
 - Sem erros 4xx ou 5xx
@@ -322,6 +351,7 @@ Após deploy para **Production**, verifique:
 ```
 
 #### 4. Netlify Functions
+
 - [ ] Funções Lambda estão respondendo
 - [ ] Logs não mostram erros de credenciais
 - [ ] Conexão com Supabase funciona
@@ -330,6 +360,7 @@ Após deploy para **Production**, verifique:
 https://app.netlify.com/sites/SEU_SITE/functions
 
 #### 5. Monitoramento
+
 - [ ] Verificar Netlify Analytics
 - [ ] Verificar Supabase Dashboard → Logs
 - [ ] Configurar alertas se disponível
@@ -341,11 +372,13 @@ https://app.netlify.com/sites/SEU_SITE/functions
 ### Problema: Deploy timeout após 5/10 minutos
 
 **Sintomas:**
+
 ```
 Error: The action 'Deploy to Netlify' has timed out after 5 minutes.
 ```
 
 **Causas possíveis:**
+
 1. Muitos arquivos sendo enviados
 2. Netlify está lento/com problemas
 3. Build process muito demorado
@@ -358,6 +391,7 @@ Error: The action 'Deploy to Netlify' has timed out after 5 minutes.
    - Production: 15 minutos
 
 2. **Otimizar build:**
+
    ```bash
    # Adicionar ao .gitignore arquivos desnecessários
    node_modules/
@@ -368,6 +402,7 @@ Error: The action 'Deploy to Netlify' has timed out after 5 minutes.
    ```
 
 3. **Usar Netlify CLI para debug local:**
+
    ```bash
    npm install -g netlify-cli
    netlify login
@@ -386,6 +421,7 @@ Error: The action 'Deploy to Netlify' has timed out after 5 minutes.
 ### Problema: Erro "Supabase credentials are required"
 
 **Sintomas:**
+
 ```
 GET /.netlify/functions/get-shopping-lists 500 (Internal Server Error)
 Error: Supabase credentials are required
@@ -396,10 +432,11 @@ Error: Supabase credentials are required
 **Solução:**
 
 1. **Verificar se secrets existem:**
+
    ```
    Settings → Secrets and variables → Actions → Repository secrets
    ```
-   
+
    Devem existir:
    - ✅ NETLIFY_AUTH_TOKEN
    - ✅ NETLIFY_SITE_ID
@@ -408,15 +445,16 @@ Error: Supabase credentials are required
    - ✅ SUPABASE_SERVICE_API_KEY
 
 2. **Testar localmente:**
+
    ```bash
    # Criar .env
    cp .env.example .env
    # Preencher com valores reais
    nano .env
-   
+
    # Testar build
    npm run build
-   
+
    # Testar Netlify Functions localmente
    netlify dev
    ```
@@ -430,6 +468,7 @@ Error: Supabase credentials are required
 ### Problema: Tests estão falhando no deploy de produção
 
 **Sintomas:**
+
 ```
 Error: Tests failed
 npm test exited with code 1
@@ -440,6 +479,7 @@ npm test exited with code 1
 **Solução:**
 
 1. **Rodar testes localmente:**
+
    ```bash
    npm test
    ```
@@ -447,15 +487,16 @@ npm test exited with code 1
 2. **Verificar logs de teste no GitHub Actions**
 
 3. **Opções:**
-   
+
    **Opção A:** Corrigir os testes (recomendado)
-   
+
    **Opção B:** Temporariamente permitir falhas (não recomendado):
+
    ```yaml
    # Em deploy-production.yml
    - name: Run tests
      run: npm test
-     continue-on-error: true  # ⚠️ Permitir falhas
+     continue-on-error: true # ⚠️ Permitir falhas
    ```
 
 ---
@@ -469,20 +510,23 @@ npm test exited with code 1
    - Verificar se assets carregam (Network tab)
 
 2. **Netlify Functions logs:**
+
    ```
    Netlify Dashboard → Functions → Ver logs
    ```
 
 3. **Supabase Dashboard:**
+
    ```
    https://app.supabase.com → Seu projeto → Logs
    ```
 
 4. **Verificar variáveis de ambiente:**
+
    ```
    Netlify → Site settings → Environment variables
    ```
-   
+
    Devem estar configuradas:
    - SUPABASE_URL
    - SUPABASE_ANON_KEY
@@ -580,29 +624,34 @@ gh release create v1.0.1 --title "v1.0.1 - Hotfix" --notes "Correção de bug cr
 Antes do primeiro deploy:
 
 ### GitHub
+
 - [ ] Repositório configurado
 - [ ] Branch `main` protegida (Settings → Branches)
 - [ ] Secrets configurados (5 secrets necessários)
 - [ ] GitHub Environments criados (staging e production)
 
 ### Netlify
+
 - [ ] Site criado no Netlify
 - [ ] Site conectado ao repositório GitHub
 - [ ] Variáveis de ambiente configuradas
 - [ ] Custom domain configurado (opcional)
 
 ### Supabase
+
 - [ ] Projeto criado
 - [ ] Tabelas criadas (rodar `database/init.sql`)
 - [ ] RLS habilitado e configurado
 - [ ] Ambas as keys copiadas (anon e service_role)
 
 ### Testes
+
 - [ ] Testes rodando localmente: `npm test`
 - [ ] Build funciona: `npm run build`
 - [ ] Netlify Dev funciona: `netlify dev`
 
 ### Deploy
+
 - [ ] Workflow CI passou
 - [ ] Deploy staging funcionou
 - [ ] Site staging testado e validado
