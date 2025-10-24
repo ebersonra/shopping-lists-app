@@ -490,12 +490,17 @@
 
       // Collect form data
       function collectFormData() {
+        // Get payment select value - only use if it's a valid UUID format
+        const paymentSelectValue = document.getElementById('paymentSelect').value;
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const paymentId = paymentSelectValue && uuidRegex.test(paymentSelectValue) ? paymentSelectValue : null;
+
         const formData = {
           title: document.getElementById('listTitle').value.trim(),
           description: document.getElementById('listDescription').value.trim(),
           shoppingDate: document.getElementById('shoppingDate').value,
           marketId: document.getElementById('marketSelect').value || null,
-          paymentId: document.getElementById('paymentSelect').value || null,
+          paymentId: paymentId,
           items: [],
         };
 
