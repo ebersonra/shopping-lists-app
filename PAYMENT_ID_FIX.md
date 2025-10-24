@@ -13,6 +13,7 @@ Error: invalid input syntax for type uuid: "credit"
 The `create-shopping-list.html` page was using hardcoded string values (`"credit"`, `"debit"`, `"pix"`) for payment methods in the dropdown, but the database `shopping_lists` table expects `payment_id` to be a UUID that references the `payment` table.
 
 **Request (Before Fix):**
+
 ```json
 {
   "user_id": "9eb946b7-7e29-4460-a9cf-81aebac2ea4c",
@@ -23,6 +24,7 @@ The `create-shopping-list.html` page was using hardcoded string values (`"credit
 ```
 
 **Database Schema:**
+
 ```sql
 CREATE TABLE shopping_lists (
     ...
@@ -42,15 +44,18 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 // Get payment select value - only use if it's a valid UUID format
 const paymentSelectValue = document.getElementById('paymentSelect').value;
-const paymentId = paymentSelectValue && UUID_REGEX.test(paymentSelectValue) ? paymentSelectValue : null;
+const paymentId =
+  paymentSelectValue && UUID_REGEX.test(paymentSelectValue) ? paymentSelectValue : null;
 ```
 
 Now, when a user selects a payment method:
+
 - If the value is a valid UUID → it's sent to the backend
 - If the value is NOT a valid UUID (like "credit") → `null` is sent instead
 - Since `payment_id` is nullable in the database, this prevents the error
 
 **Request (After Quick Fix):**
+
 ```json
 {
   "user_id": "9eb946b7-7e29-4460-a9cf-81aebac2ea4c",
@@ -65,31 +70,37 @@ Now, when a user selects a payment method:
 Implemented a full payment methods management system:
 
 #### 1. Shared Validation Utility (`src/utils/validation.js`)
+
 - Extracted UUID regex to a shared constant
 - Created reusable `isValidUUID()` and `validateUUID()` functions
 - Used across test files and production code for consistency
 
 #### 2. Payment Repository (`src/repositories/paymentRepository.js`)
+
 - `getPaymentMethods(user_id, options)` - Fetch user's payment methods from Supabase
 - `createPaymentMethod(paymentData)` - Create new payment method
 - `updatePaymentMethod(payment_id, user_id, updates)` - Update payment method
 - `deletePaymentMethod(payment_id, user_id)` - Soft delete payment method
 
 #### 3. Payment Service (`src/services/paymentService.js`)
+
 - Business logic layer with validation
 - Validates payment types (debit, credit, pix)
 - Validates description length (max 200 chars)
 - Normalizes data before saving
 
 #### 4. Payment Controller (`src/controllers/paymentController.js`)
+
 - HTTP request handler that delegates to service
 - Parameter validation and error handling
 
 #### 5. API Endpoints
+
 - `GET /.netlify/functions/get-payment-methods?user_id={uuid}` - Get user's payment methods
 - `POST /.netlify/functions/create-payment-method` - Create new payment method
 
 #### 6. UI Updates (`create-shopping-list.html`)
+
 - Updated `loadPaymentMethods()` to fetch from Supabase API instead of hardcoded values
 - Added payment creation dialog with form validation
 - Added "Adicionar Forma de Pagamento" button below payment select
@@ -97,6 +108,7 @@ Implemented a full payment methods management system:
 - Shows payment description and "(Padrão)" label for default payment method
 
 #### 7. Styling (`static/css/create-shopping-list.css`)
+
 - Added modern dialog overlay with backdrop blur
 - Responsive dialog layout
 - Consistent with existing dark theme
@@ -125,6 +137,7 @@ Implemented a full payment methods management system:
 ## Features
 
 ### For Users
+
 - ✅ Can view their saved payment methods when creating a shopping list
 - ✅ Can add new payment methods directly from the create list page
 - ✅ Can set a payment method as default
@@ -132,6 +145,7 @@ Implemented a full payment methods management system:
 - ✅ Can create lists without selecting a payment method (optional)
 
 ### For Developers
+
 - ✅ Clean separation of concerns (Repository → Service → Controller pattern)
 - ✅ Comprehensive validation at all layers
 - ✅ Reusable UUID validation utility
@@ -146,4 +160,3 @@ Implemented a full payment methods management system:
 - ✅ User authorization on all payment method operations
 - ✅ Soft delete prevents data loss
 - ✅ Description length limits prevent abuse
-

@@ -151,18 +151,22 @@
     </main>
 
     <!-- Payment Method Dialog -->
-    <div id="paymentDialog" class="dialog-overlay" style="display: none;">
+    <div id="paymentDialog" class="dialog-overlay" style="display: none">
       <div class="dialog-content">
         <div class="dialog-header">
           <h2>Adicionar Forma de Pagamento</h2>
           <button type="button" class="dialog-close" onclick="closePaymentDialog()">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
             </svg>
           </button>
         </div>
         <div class="dialog-body">
-          <p>Você ainda não tem nenhuma forma de pagamento cadastrada. Deseja adicionar uma agora?</p>
+          <p>
+            Você ainda não tem nenhuma forma de pagamento cadastrada. Deseja adicionar uma agora?
+          </p>
           <form id="paymentForm">
             <div class="input-group">
               <label for="paymentType">Tipo de Pagamento <span class="required">*</span></label>
@@ -175,10 +179,10 @@
             </div>
             <div class="input-group">
               <label for="paymentDescription">Descrição</label>
-              <input 
-                type="text" 
-                id="paymentDescription" 
-                name="description" 
+              <input
+                type="text"
+                id="paymentDescription"
+                name="description"
                 placeholder="Ex: Cartão Visa, Banco do Brasil..."
                 maxlength="200"
               />
@@ -192,7 +196,9 @@
           </form>
         </div>
         <div class="dialog-actions">
-          <button type="button" class="btn-secondary" onclick="closePaymentDialog()">Cancelar</button>
+          <button type="button" class="btn-secondary" onclick="closePaymentDialog()">
+            Cancelar
+          </button>
           <button type="button" class="btn-primary" onclick="savePaymentMethod()">Salvar</button>
         </div>
       </div>
@@ -339,7 +345,9 @@
         try {
           const user_id = await getUserId();
 
-          const response = await fetch(`/.netlify/functions/get-payment-methods?user_id=${user_id}`);
+          const response = await fetch(
+            `/.netlify/functions/get-payment-methods?user_id=${user_id}`
+          );
 
           if (!response.ok) {
             console.error('Failed to load payment methods:', response.status);
@@ -560,7 +568,8 @@
       function collectFormData() {
         // Get payment select value - only use if it's a valid UUID format
         const paymentSelectValue = document.getElementById('paymentSelect').value;
-        const paymentId = paymentSelectValue && UUID_REGEX.test(paymentSelectValue) ? paymentSelectValue : null;
+        const paymentId =
+          paymentSelectValue && UUID_REGEX.test(paymentSelectValue) ? paymentSelectValue : null;
 
         const formData = {
           title: document.getElementById('listTitle').value.trim(),
@@ -756,11 +765,11 @@
       // Add button to open payment dialog next to payment select
       function addCreatePaymentButton() {
         const paymentSelectGroup = document.getElementById('paymentSelect').parentElement;
-        
+
         // Create button container
         const buttonContainer = document.createElement('div');
         buttonContainer.style.marginTop = '8px';
-        
+
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'btn-secondary';
@@ -768,13 +777,13 @@
         button.style.padding = '8px 16px';
         button.textContent = '+ Adicionar Forma de Pagamento';
         button.onclick = showPaymentDialog;
-        
+
         buttonContainer.appendChild(button);
         paymentSelectGroup.appendChild(buttonContainer);
       }
 
       // Call this after page loads
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
         addCreatePaymentButton();
       });
     </script>

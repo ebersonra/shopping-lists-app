@@ -5,7 +5,7 @@ const { validateUUID } = require('../src/utils/validation');
 
 /**
  * Tests for payment_id UUID validation in create-shopping-list
- * 
+ *
  * This test validates that the HTML form correctly handles payment_id values:
  * - Non-UUID values (like "credit", "debit", "pix") should be converted to null
  * - Valid UUID values should be preserved

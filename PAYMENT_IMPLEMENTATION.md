@@ -7,7 +7,9 @@ This PR implements a complete payment methods management system for the shopping
 ## What Was Fixed
 
 ### Critical Bug Fix
+
 **Issue:** Creating a shopping list with payment method selected resulted in error:
+
 ```
 Error: invalid input syntax for type uuid: "credit"
 ```
@@ -19,43 +21,51 @@ Error: invalid input syntax for type uuid: "credit"
 ## What Was Implemented
 
 ### 1. Code Quality Improvements (Addressing Review Comments)
+
 - ✅ Extracted UUID regex pattern to constant `UUID_REGEX` in HTML file
 - ✅ Created shared utility module `src/utils/validation.js` for UUID validation
 - ✅ Updated tests to use shared validation utility
 - ✅ Ensured consistency between production and test code
 
 ### 2. Backend Infrastructure
+
 Created a complete payment methods API following the Repository → Service → Controller pattern:
 
 **Repository Layer** (`src/repositories/paymentRepository.js`)
+
 - Database access using Supabase client
 - CRUD operations for payment methods
 - Soft delete support
 
 **Service Layer** (`src/services/paymentService.js`)
+
 - Business logic validation
 - Payment type validation (debit, credit, pix)
 - Description length validation (max 200 chars)
 - Data normalization
 
 **Controller Layer** (`src/controllers/paymentController.js`)
+
 - HTTP request handling
 - Parameter validation
 - Error handling
 
 **API Endpoints:**
+
 - `GET /.netlify/functions/get-payment-methods?user_id={uuid}`
 - `POST /.netlify/functions/create-payment-method`
 
 ### 3. Frontend Features
 
 **Payment Methods Loading:**
+
 - Replaced hardcoded payment options with real data from Supabase
 - Shows user's saved payment methods with descriptions
 - Indicates default payment method with "(Padrão)" label
 - Gracefully handles users with no payment methods
 
 **Payment Creation Dialog:**
+
 - Modern dialog overlay with backdrop blur
 - Form validation for required fields
 - Fields:
@@ -66,12 +76,14 @@ Created a complete payment methods API following the Repository → Service → 
 - Auto-refresh dropdown after adding new payment method
 
 **UI/UX Enhancements:**
+
 - Added "Adicionar Forma de Pagamento" button below payment select
 - Dialog can be opened at any time during list creation
 - Payment methods are optional - users can create lists without selecting one
 - Consistent with existing dark theme design
 
 ### 4. Testing
+
 - ✅ 9 payment-id validation tests (all passing)
 - ✅ 12 payment API tests (all passing)
 - ✅ Validation utility tests (all passing)
@@ -80,6 +92,7 @@ Created a complete payment methods API following the Repository → Service → 
 ## Files Changed
 
 ### New Files Created:
+
 1. `src/utils/validation.js` - Shared UUID validation utility
 2. `src/repositories/paymentRepository.js` - Payment data access layer
 3. `src/services/paymentService.js` - Payment business logic
@@ -89,6 +102,7 @@ Created a complete payment methods API following the Repository → Service → 
 7. `tests/payment-api.test.js` - API tests
 
 ### Modified Files:
+
 1. `src/pages/create-shopping-list.html` - UUID constant, API integration, dialog
 2. `static/css/create-shopping-list.css` - Dialog styles
 3. `tests/payment-id-validation.test.js` - Use shared utility
@@ -97,6 +111,7 @@ Created a complete payment methods API following the Repository → Service → 
 ## User Benefits
 
 Users can now:
+
 - ✅ View their saved payment methods when creating shopping lists
 - ✅ Add new payment methods directly from the create list page
 - ✅ Set a payment method as default for future use
@@ -138,20 +153,24 @@ Users can now:
 ## Deployment Notes
 
 **Database Requirements:**
+
 - Ensure `payment` table exists in Supabase (created by `database/create_payment_table.sql`)
 - Verify `shopping_lists.payment_id` column references `payment(id)`
 
 **Environment Variables:**
+
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_SERVICE_API_KEY` (or equivalent) - Supabase API key
 
 **API Endpoints:**
+
 - Deploy `get-payment-methods` function
 - Deploy `create-payment-method` function
 
 ## Future Enhancements
 
 Potential improvements for future PRs:
+
 1. Payment method editing (update description, change default)
 2. Payment method deletion UI
 3. Payment method icons for better visual distinction
@@ -162,6 +181,7 @@ Potential improvements for future PRs:
 ## Conclusion
 
 This PR successfully:
+
 1. ✅ Fixed the critical payment_id UUID validation bug
 2. ✅ Addressed code review comments about extracting UUID regex
 3. ✅ Implemented a complete payment methods management system

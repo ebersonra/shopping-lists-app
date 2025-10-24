@@ -209,7 +209,10 @@ test('Validation utility - isValidUUID should validate correctly', () => {
 test('Validation utility - validateUUID should return UUID or null', () => {
   const { validateUUID } = require('../src/utils/validation');
 
-  assert.strictEqual(validateUUID('123e4567-e89b-12d3-a456-426614174000'), '123e4567-e89b-12d3-a456-426614174000');
+  assert.strictEqual(
+    validateUUID('123e4567-e89b-12d3-a456-426614174000'),
+    '123e4567-e89b-12d3-a456-426614174000'
+  );
   assert.strictEqual(validateUUID('not-a-uuid'), null);
   assert.strictEqual(validateUUID(''), null);
   assert.strictEqual(validateUUID(null), null);
