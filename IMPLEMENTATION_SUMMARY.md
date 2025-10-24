@@ -9,6 +9,7 @@ A funcionalidade de edição de itens da lista de compras foi implementada com s
 ### Mudanças Implementadas
 
 #### 1. Interface do Usuário (Frontend)
+
 - **Arquivo**: `src/pages/view-shopping-list.html`
 - **Adições**:
   - Botão de edição (ícone de lápis) ao lado do botão de exclusão em cada item
@@ -19,6 +20,7 @@ A funcionalidade de edição de itens da lista de compras foi implementada com s
   - Atualização automática da interface após edição
 
 #### 2. API Backend
+
 - **Arquivo**: `src/api/update-shopping-list-item.js`
 - **Modificações**:
   - Adição de 3 novos campos aceitos: `product_name`, `category`, `unit`
@@ -30,12 +32,14 @@ A funcionalidade de edição de itens da lista de compras foi implementada com s
     - `unit_price`: não pode ser negativo
 
 #### 3. Estilo CSS
+
 - **Arquivo**: `static/css/view-shopping-list.css`
 - **Adição**:
   - Estilo hover azul para o botão de edição
   - Consistência visual com o restante da aplicação
 
 #### 4. Testes
+
 - **Arquivo**: `tests/update-shopping-list-item-api.test.js`
 - **Adições**: 6 novos testes
   1. Teste de atualização de `product_name`
@@ -46,6 +50,7 @@ A funcionalidade de edição de itens da lista de compras foi implementada com s
   6. Validação de `unit` vazia
 
 #### 5. Documentação
+
 - **Arquivo**: `EDIT_ITEMS_FEATURE.md`
 - Documentação completa da feature com:
   - Descrição detalhada
@@ -56,28 +61,28 @@ A funcionalidade de edição de itens da lista de compras foi implementada com s
 
 ## 📊 Métricas
 
-| Métrica | Valor |
-|---------|-------|
-| **Testes Total** | 91 |
-| **Testes Novos** | 6 |
-| **Taxa de Sucesso** | 100% |
-| **Vulnerabilidades** | 0 |
-| **Arquivos Modificados** | 4 |
-| **Linhas Adicionadas** | ~496 |
-| **Documentação** | Completa |
+| Métrica                  | Valor    |
+| ------------------------ | -------- |
+| **Testes Total**         | 91       |
+| **Testes Novos**         | 6        |
+| **Taxa de Sucesso**      | 100%     |
+| **Vulnerabilidades**     | 0        |
+| **Arquivos Modificados** | 4        |
+| **Linhas Adicionadas**   | ~496     |
+| **Documentação**         | Completa |
 
 ## 🎯 Requisitos Atendidos
 
-| Requisito | Status |
-|-----------|--------|
-| Editar valor unitário | ✅ |
-| Editar quantidade | ✅ |
-| Editar descrição/nome | ✅ |
-| Recalcular valores após edição | ✅ |
-| Validação de campos | ✅ |
-| Testes abrangentes | ✅ |
-| Interface intuitiva | ✅ |
-| Documentação | ✅ |
+| Requisito                      | Status |
+| ------------------------------ | ------ |
+| Editar valor unitário          | ✅     |
+| Editar quantidade              | ✅     |
+| Editar descrição/nome          | ✅     |
+| Recalcular valores após edição | ✅     |
+| Validação de campos            | ✅     |
+| Testes abrangentes             | ✅     |
+| Interface intuitiva            | ✅     |
+| Documentação                   | ✅     |
 
 ## 🔒 Segurança
 
@@ -101,11 +106,13 @@ A funcionalidade de edição de itens da lista de compras foi implementada com s
 ## 🎨 Experiência do Usuário
 
 ### Antes
+
 - Usuários precisavam deletar e recriar itens para corrigir erros
 - Processo demorado e propenso a erros
 - Perda de histórico do item
 
 ### Depois
+
 - ✅ Edição rápida e intuitiva
 - ✅ Preservação do histórico
 - ✅ Feedback visual imediato
@@ -147,9 +154,11 @@ npm run test:watch
 ## 📸 Evidências Visuais
 
 ### Screenshot 1: Botão de Edição
+
 ![Edit Button](https://github.com/user-attachments/assets/2f7769fd-15bd-4645-949c-0495ececc783)
 
 ### Screenshot 2: Hover Azul
+
 ![Edit Hover](https://github.com/user-attachments/assets/2e481d5f-5f9f-4c72-9268-94fc1b73cd5f)
 
 ## 🎓 Lições Aprendidas
