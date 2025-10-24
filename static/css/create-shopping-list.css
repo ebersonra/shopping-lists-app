@@ -679,3 +679,82 @@ textarea {
     animation: none;
   }
 }
+
+/* Payment Dialog Styles */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-4);
+}
+
+.dialog-content {
+  background: var(--color-background);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 100%;
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.dialog-header {
+  padding: var(--space-6);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.dialog-close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+}
+
+.dialog-close:hover {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--color-text);
+}
+
+.dialog-body {
+  padding: var(--space-6);
+}
+
+.dialog-body p {
+  margin-top: 0;
+  margin-bottom: var(--space-6);
+  color: var(--color-text-muted);
+}
+
+.dialog-actions {
+  padding: var(--space-6);
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+
+.dialog-actions button {
+  min-width: 100px;
+}

@@ -150,11 +150,68 @@
       </form>
     </main>
 
+    <!-- Payment Method Dialog -->
+    <div id="paymentDialog" class="dialog-overlay" style="display: none">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h2>Adicionar Forma de Pagamento</h2>
+          <button type="button" class="dialog-close" onclick="closePaymentDialog()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="dialog-body">
+          <p>
+            Você ainda não tem nenhuma forma de pagamento cadastrada. Deseja adicionar uma agora?
+          </p>
+          <form id="paymentForm">
+            <div class="input-group">
+              <label for="paymentType">Tipo de Pagamento <span class="required">*</span></label>
+              <select id="paymentType" name="type" required>
+                <option value="">Selecione</option>
+                <option value="credit">Cartão de Crédito</option>
+                <option value="debit">Cartão de Débito</option>
+                <option value="pix">PIX</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="paymentDescription">Descrição</label>
+              <input
+                type="text"
+                id="paymentDescription"
+                name="description"
+                placeholder="Ex: Cartão Visa, Banco do Brasil..."
+                maxlength="200"
+              />
+            </div>
+            <div class="input-group">
+              <label>
+                <input type="checkbox" id="paymentDefault" name="is_default" />
+                Definir como padrão
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn-secondary" onclick="closePaymentDialog()">
+            Cancelar
+          </button>
+          <button type="button" class="btn-primary" onclick="savePaymentMethod()">Salvar</button>
+        </div>
+      </div>
+    </div>
+
     <script>
       // Global variables
       let itemCounter = 0;
       let listItems = [];
       let currentUser = null;
+
+      // UUID validation regex - shared constant
+      const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
       // Categories for items
       const categories = [
@@ -286,13 +343,19 @@
       // In a production app, this would fetch from an API
       async function loadPaymentMethods() {
         try {
-          // For now, return hardcoded payment types that users can select
-          // In a real implementation, this would fetch user's saved payment methods from the database
-          return [
-            { id: 'debit', type: 'debit', description: 'Cartão de Débito' },
-            { id: 'credit', type: 'credit', description: 'Cartão de Crédito' },
-            { id: 'pix', type: 'pix', description: 'PIX' },
-          ];
+          const user_id = await getUserId();
+
+          const response = await fetch(
+            `/.netlify/functions/get-payment-methods?user_id=${user_id}`
+          );
+
+          if (!response.ok) {
+            console.error('Failed to load payment methods:', response.status);
+            return [];
+          }
+
+          const data = await response.json();
+          return data.paymentMethods || [];
         } catch (error) {
           console.error('Error loading payment methods:', error);
           return [];
@@ -305,10 +368,23 @@
           const paymentMethods = await loadPaymentMethods();
           const select = document.getElementById('paymentSelect');
 
+          // Clear existing options except the first one
+          while (select.options.length > 1) {
+            select.remove(1);
+          }
+
+          if (paymentMethods.length === 0) {
+            // No payment methods found - show dialog to create one
+            console.log('No payment methods found for user');
+            // The user can still create a list without a payment method
+            return;
+          }
+
           paymentMethods.forEach((payment) => {
             const option = document.createElement('option');
             option.value = payment.id;
-            option.textContent = payment.description;
+            const defaultLabel = payment.is_default ? ' (Padrão)' : '';
+            option.textContent = `${payment.description || payment.type}${defaultLabel}`;
             select.appendChild(option);
           });
         } catch (error) {
@@ -490,12 +566,17 @@
 
       // Collect form data
       function collectFormData() {
+        // Get payment select value - only use if it's a valid UUID format
+        const paymentSelectValue = document.getElementById('paymentSelect').value;
+        const paymentId =
+          paymentSelectValue && UUID_REGEX.test(paymentSelectValue) ? paymentSelectValue : null;
+
         const formData = {
           title: document.getElementById('listTitle').value.trim(),
           description: document.getElementById('listDescription').value.trim(),
           shoppingDate: document.getElementById('shoppingDate').value,
           marketId: document.getElementById('marketSelect').value || null,
-          paymentId: document.getElementById('paymentSelect').value || null,
+          paymentId: paymentId,
           items: [],
         };
 
@@ -620,6 +701,91 @@
           console.log('Draft found:', data);
         }
       }
+
+      // Payment Dialog Functions
+      function showPaymentDialog() {
+        document.getElementById('paymentDialog').style.display = 'flex';
+      }
+
+      function closePaymentDialog() {
+        document.getElementById('paymentDialog').style.display = 'none';
+        document.getElementById('paymentForm').reset();
+      }
+
+      async function savePaymentMethod() {
+        const form = document.getElementById('paymentForm');
+        const type = document.getElementById('paymentType').value;
+        const description = document.getElementById('paymentDescription').value.trim();
+        const is_default = document.getElementById('paymentDefault').checked;
+
+        if (!type) {
+          alert('Por favor, selecione o tipo de pagamento');
+          return;
+        }
+
+        try {
+          const user_id = await getUserId();
+
+          const response = await fetch('/.netlify/functions/create-payment-method', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              user_id,
+              type,
+              description: description || null,
+              is_default,
+              enabled: true,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erro ao salvar forma de pagamento');
+          }
+
+          const result = await response.json();
+          console.log('Payment method created:', result);
+
+          // Close dialog
+          closePaymentDialog();
+
+          // Reload payment methods
+          await populatePaymentMethods();
+
+          // Show success message
+          alert('Forma de pagamento adicionada com sucesso!');
+        } catch (error) {
+          console.error('Error saving payment method:', error);
+          alert(`Erro ao salvar forma de pagamento: ${error.message}`);
+        }
+      }
+
+      // Add button to open payment dialog next to payment select
+      function addCreatePaymentButton() {
+        const paymentSelectGroup = document.getElementById('paymentSelect').parentElement;
+
+        // Create button container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.marginTop = '8px';
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn-secondary';
+        button.style.fontSize = '14px';
+        button.style.padding = '8px 16px';
+        button.textContent = '+ Adicionar Forma de Pagamento';
+        button.onclick = showPaymentDialog;
+
+        buttonContainer.appendChild(button);
+        paymentSelectGroup.appendChild(buttonContainer);
+      }
+
+      // Call this after page loads
+      document.addEventListener('DOMContentLoaded', function () {
+        addCreatePaymentButton();
+      });
     </script>
   </body>
 </html>
