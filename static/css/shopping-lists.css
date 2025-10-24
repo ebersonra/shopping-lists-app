@@ -1442,8 +1442,6 @@
         font-weight: var(--font-bold);
         margin-bottom: var(--space-6);
       }
-        margin-bottom: var(--space-6);
-      }
 
       .activity-list {
         display: flex;
